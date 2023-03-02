@@ -36,9 +36,9 @@ const general = [
   makeSection(
     'Get started',
     [
-      makePage('get-started/installation.mdx'),
-      makePage('get-started/create-a-new-app.mdx'),
-      makePage('get-started/errors.mdx'),
+      makePage('home/get-started/installation.mdx'),
+      makePage('home/get-started/expo-go.mdx'),
+      makePage('home/get-started/create-a-project.mdx'),
     ],
     { expanded: true }
   ),
