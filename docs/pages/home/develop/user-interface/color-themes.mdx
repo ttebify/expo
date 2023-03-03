@@ -27,7 +27,11 @@ The available options are `automatic` (follow system appearance settings and not
 }
 ```
 
-In development builds, you'll need to install the native package [`expo-system-ui`](/versions/latest/sdk/system-ui/#installation) otherwise the `userInterfaceStyle` property will be ignored. You can also run `npx expo config --type introspect` to check if the project is misconfigured. If it is, you'll see a warning as shown below:
+In development builds, you'll need to install the native package [`expo-system-ui`](/versions/latest/sdk/system-ui/#installation) otherwise the `userInterfaceStyle` property will be ignored. You can also the following command to check if the project is misconfigured:
+
+<Terminal cmd={['npx expo config --type introspect']} />
+
+If the project is misconfigured, you'll see a warning as shown below:
 
 <Terminal
   cmd={[
