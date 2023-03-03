@@ -53,6 +53,7 @@ const general = [
           makePage('home/develop/user-interface/app-icons.mdx'),
           makePage('home/develop/user-interface/safe-areas.mdx'),
           makePage('home/develop/user-interface/fonts.mdx'),
+          makePage('home/develop/user-interface/color-themes.mdx'),
         ],
         { expanded: true }
       ),
