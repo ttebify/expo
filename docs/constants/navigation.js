@@ -46,7 +46,15 @@ const general = [
     'Develop',
     [
       makePage('home/develop/project-structure.mdx'),
-      makeGroup('User interface', [makePage('home/develop/splash-screen.mdx')], { expanded: true }),
+      makeGroup(
+        'User interface',
+        [
+          makePage('home/develop/splash-screen.mdx'),
+          makePage('home/develop/safe-areas.mdx'),
+          makePage('home/develop/fonts.mdx'),
+        ],
+        { expanded: true }
+      ),
       makeGroup(
         'Tutorial',
         [
