@@ -10,13 +10,13 @@ import { Collapsible } from '~/ui/components/Collapsible';
 
 A splash screen, also known as a launch screen, is the first screen a user sees when they open your app. It stays visible while the app is loading. You can also control the behavior of when a splash screen disappears by using the native [SplashScreen API](/versions/latest/sdk/splash-screen).
 
-## Customize the splash screen for your app
+## Configure the splash screen for your app
 
 The default splash screen is a blank white screen. It can be customized using the `splash` key in the project's [**app.json**](/workflow/configuration).
 
 ## Make a splash image
 
-To create an app icon and splash image, you can use this [Figma template](https://www.figma.com/community/file/1155362909441341285). It provides a bare minimum design for an icon and splash images for Android and iOS.
+To create a splash image, you can use this [Figma template](https://www.figma.com/community/file/1155362909441341285). It provides a bare minimum design for an icon and splash images for Android and iOS.
 
 For an in-detail walkthrough, see the video below:
 
@@ -146,7 +146,7 @@ Your app can be opened from the Expo Go or in a standalone app, and it can be ei
 - **In the middle**, Expo Go loads a published app. Notice that again the splash image does not appear immediately.
 - **On the right** is a standalone app. Notice that the splash image appears immediately.
 
-### iOS Caching
+### iOS caching
 
 In custom iOS builds, launch screens can sometimes remain cached between builds, making it harder to test new images. Apple recommends clearing the _derived data_ folder before rebuilding, this can be done with Expo CLI by running:
 

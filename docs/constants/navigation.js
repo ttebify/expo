@@ -49,9 +49,10 @@ const general = [
       makeGroup(
         'User interface',
         [
-          makePage('home/develop/splash-screen.mdx'),
-          makePage('home/develop/safe-areas.mdx'),
-          makePage('home/develop/fonts.mdx'),
+          makePage('home/develop/user-interface/splash-screen.mdx'),
+          makePage('home/develop/user-interface/app-icons.mdx'),
+          makePage('home/develop/user-interface/safe-areas.mdx'),
+          makePage('home/develop/user-interface/fonts.mdx'),
         ],
         { expanded: true }
       ),
