@@ -45,20 +45,8 @@ const general = [
   makeSection(
     'Develop',
     [
-      makePage('tutorial/introduction.mdx'),
-      makeGroup(
-        'User interface',
-        [
-          makePage('guides/assets.mdx'),
-          makePage('guides/icons.mdx'),
-          makePage('guides/app-icons.mdx'),
-          makePage('guides/splash-screens.mdx'),
-          makePage('guides/configuring-statusbar.mdx'),
-          makePage('guides/color-schemes.mdx'),
-          makePage('guides/using-custom-fonts.mdx'),
-        ],
-        { expanded: true }
-      ),
+      makePage('home/develop/project-structure.mdx'),
+      makeGroup('User interface', [makePage('home/develop/splash-screen.mdx')], { expanded: true }),
       makeGroup(
         'Tutorial',
         [
