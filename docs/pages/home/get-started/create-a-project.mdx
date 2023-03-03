@@ -42,8 +42,6 @@ Start the development server by running the following command:
   cmdCopy="npx expo start"
 />
 
-<Terminal cmd={['$ npx expo start']} />
-
 When you run the above command, the Expo CLI starts [Metro Bundler](/guides/customizing-metro). This bundler is an HTTP server that compiles the JavaScript code of your app using [Babel](https://babeljs.io/) and serves it to the Expo app. See how [Expo Development Server](/workflow/expo-cli#develop) works for more information about this process.
 
 </Step>
@@ -63,11 +61,11 @@ You can open the project on multiple devices simultaneously. Go ahead and try it
 
 First, make sure you are on the same Wi-Fi network on your computer and your device.
 
-If it still doesn't work, it may be due to the router configuration &mdash; this is common for public networks. You can work around this by choosing the "Tunnel" connection type when starting the development server, then scanning the QR code again.
+If it still doesn't work, it may be due to the router configuration &mdash; this is common for public networks. You can work around this by choosing the **Tunnel** connection type when starting the development server, then scanning the QR code again.
 
 <Terminal cmd={['$ npx expo start --tunnel']} />
 
-> Using the "Tunnel" connection type will make app reloads considerably slower than on "LAN" or "Local", so it's best to avoid tunnel when possible. You may want to install an emulator/simulator to speed up development if "Tunnel" is required for accessing your machine from another device on your network.
+> Using the **Tunnel** connection type will make the app reloads considerably slower than on **LAN** or **Local**, so it's best to avoid tunnel when possible. You may want to install an emulator/simulator to speed up development if **Tunnel** is required for accessing your machine from another device on your network.
 
 </Collapsible>
 
@@ -77,7 +75,7 @@ If you are using an emulator/simulator, you may find the following Expo CLI keyb
 
 - Pressing <kbd>a</kbd> will open in an [Android Emulator or connected device](/workflow/android-studio-emulator).
 - Pressing <kbd>i</kbd> will open in an [iOS Simulator](/workflow/ios-simulator).
-- Pressing <kbd>w</kbd> will open in a web browser. Expo supports all major browsers.
+- Pressing <kbd>w</kbd> will open in a [web browser](/workflow/web). Expo supports all major browsers.
 
 </Collapsible>
 
@@ -107,6 +105,8 @@ Expo Go is configured by default to automatically reload the app whenever a file
 </Collapsible>
 
 ## Next steps
+
+Now that you have your first project up and running, in the next step, you will learn more about the [project's structure](/home/develop/project-structure), and how to continue developing it.
 
 {/* Add a link to the project structure page here to allow the user to continue their journey */}
 
