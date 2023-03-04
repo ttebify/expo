@@ -54,6 +54,7 @@ const general = [
           makePage('home/develop/user-interface/safe-areas.mdx'),
           makePage('home/develop/user-interface/fonts.mdx'),
           makePage('home/develop/user-interface/color-themes.mdx'),
+          makePage('home/develop/user-interface/animation.mdx'),
         ],
         { expanded: true }
       ),
