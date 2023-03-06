@@ -133,7 +133,6 @@ export const renderProp = (
         ) : null}
       </P>
       <CommentTextBlock comment={extractedComment} includePlatforms={false} />
-      <br />
     </div>
   );
 };
