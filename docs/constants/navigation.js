@@ -55,6 +55,7 @@ const general = [
           makePage('home/develop/user-interface/fonts.mdx'),
           makePage('home/develop/user-interface/color-themes.mdx'),
           makePage('home/develop/user-interface/animation.mdx'),
+          makePage('home/develop/user-interface/storing-data.mdx'),
         ],
         { expanded: true }
       ),
