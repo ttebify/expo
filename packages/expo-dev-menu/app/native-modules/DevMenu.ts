@@ -1,5 +1,5 @@
-import { DeviceEventEmitter, NativeModules, EventSubscription } from 'react-native';
-
+import { requireNativeModule } from 'expo-modules-core';
+import { DeviceEventEmitter, NativeModules, Platform, EventSubscription } from 'react-native';
 export type JSEngine = 'Hermes' | 'JSC' | 'V8';
 
 export type AppInfo = {
@@ -28,7 +28,10 @@ export type MenuPreferences = {
   isOnboardingFinished?: boolean;
 };
 
-const DevMenu = NativeModules.ExpoDevMenuInternal;
+const DevMenu =
+  Platform.OS === 'android'
+    ? requireNativeModule('ExpoDevMenuInternal')
+    : NativeModules.ExpoDevMenuInternal;
 
 export async function dispatchCallableAsync(
   callableId: string,
