@@ -6,10 +6,10 @@ import XCTest
 
 class EXUpdatesCodeSigningAlgorithmTests : XCTestCase {
   func test_parseCodeSigningAlgorithm() {
-    XCTAssertEqual(try EXUpdatesCodeSigningAlgorithm.parseFromString(nil), EXUpdatesCodeSigningAlgorithm.RSA_SHA256)
-    XCTAssertEqual(try EXUpdatesCodeSigningAlgorithm.parseFromString("rsa-v1_5-sha256"), EXUpdatesCodeSigningAlgorithm.RSA_SHA256)
-    XCTAssertThrowsError(try EXUpdatesCodeSigningAlgorithm.parseFromString("invalid")) { error in
-      XCTAssertEqual(error as? EXUpdatesCodeSigningError, EXUpdatesCodeSigningError.AlgorithmParseError)
+    XCTAssertEqual(try CodeSigningAlgorithm.parseFromString(nil), CodeSigningAlgorithm.RSA_SHA256)
+    XCTAssertEqual(try CodeSigningAlgorithm.parseFromString("rsa-v1_5-sha256"), CodeSigningAlgorithm.RSA_SHA256)
+    XCTAssertThrowsError(try CodeSigningAlgorithm.parseFromString("invalid")) { error in
+      XCTAssertEqual(error as? CodeSigningError, CodeSigningError.AlgorithmParseError)
     }
   }
 }
