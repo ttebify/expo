@@ -8,7 +8,7 @@ import EXManifests
 class EXUpdatesDatabaseSpec : ExpoSpec {
   override func spec() {
     var testDatabaseDir: URL!
-    var db: EXUpdatesDatabase!
+    var db: UpdatesDatabase!
     var manifest: EXManifestsNewManifest!
     var config: EXUpdatesConfig!
     
@@ -22,7 +22,7 @@ class EXUpdatesDatabaseSpec : ExpoSpec {
         try! FileManager.default.createDirectory(atPath: testDatabaseDir.path, withIntermediateDirectories: true)
       }
       
-      db = EXUpdatesDatabase()
+      db = UpdatesDatabase()
       db.databaseQueue.sync {
         try! db.openDatabase(inDirectory: testDatabaseDir)
       }
@@ -72,7 +72,7 @@ class EXUpdatesDatabaseSpec : ExpoSpec {
           """
           expect {
             try db.execute(sql: sql, withArgs: [update.updateId, 47])
-          }.to(throwError(errorType: EXUpdatesDatabaseUtilsError.self) { error in
+          }.to(throwError(errorType: UpdatesDatabaseUtilsError.self) { error in
             expect(error.info?.extendedCode) == 787 // SQLITE_CONSTRAINT_FOREIGNKEY
           })
         }

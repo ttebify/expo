@@ -83,7 +83,7 @@ public class EXUpdatesAppController: NSObject, EXUpdatesAppLoaderTaskDelegate, E
    */
   public var config: EXUpdatesConfig
   internal var launcher: EXUpdatesAppLauncher?
-  public let database: EXUpdatesDatabase
+  public let database: UpdatesDatabase
   internal var defaultSelectionPolicy: EXUpdatesSelectionPolicy
   private let errorRecovery: EXUpdatesErrorRecovery
   public internal(set) var updatesDirectory: URL?
@@ -116,7 +116,7 @@ public class EXUpdatesAppController: NSObject, EXUpdatesAppLoaderTaskDelegate, E
       .raise()
     }
     self.config = configInit!
-    self.database = EXUpdatesDatabase()
+    self.database = UpdatesDatabase()
     self.defaultSelectionPolicy = EXUpdatesSelectionPolicyFactory.filterAwarePolicy(
       withRuntimeVersion: EXUpdatesUtils.getRuntimeVersion(withConfig: self.config)
     )
@@ -246,7 +246,7 @@ public class EXUpdatesAppController: NSObject, EXUpdatesAppLoaderTaskDelegate, E
       return
     }
 
-    EXUpdatesBuildData.ensureBuildDataIsConsistentAsync(database: database, config: config)
+    BuildData.ensureBuildDataIsConsistentAsync(database: database, config: config)
 
     errorRecovery.startMonitoring()
 
@@ -458,7 +458,7 @@ public class EXUpdatesAppController: NSObject, EXUpdatesAppLoaderTaskDelegate, E
 
   internal func runReaper() {
     if let launchedUpdate = launcher?.launchedUpdate {
-      EXUpdatesReaper.reapUnusedUpdates(
+      UpdatesReaper.reapUnusedUpdates(
         withConfig: config,
         database: database,
         directory: updatesDirectory!,

@@ -14,7 +14,7 @@ extension Data {
 
 class EXUpdatesFileDownloaderManifestParsingSpec : ExpoSpec {
   override func spec() {
-    let database = EXUpdatesDatabase()
+    let database = UpdatesDatabase()
     let classicJSON = TestHelper.testClassicBody
     let modernJSON = TestHelper.testBody
     let modernJSONCertificate = try! TestHelper.getTestCertificate(.test)

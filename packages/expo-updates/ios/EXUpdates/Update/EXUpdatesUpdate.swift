@@ -98,12 +98,12 @@ public class EXUpdatesUpdate: NSObject {
   public var failedLaunchCount: Int
 
   private let config: EXUpdatesConfig
-  private let database: EXUpdatesDatabase?
+  private let database: UpdatesDatabase?
 
   public init(
     manifest: EXManifestsManifest,
     config: EXUpdatesConfig,
-    database: EXUpdatesDatabase?,
+    database: UpdatesDatabase?,
     updateId: UUID,
     scopeKey: String,
     commitTime: Date,
@@ -135,7 +135,7 @@ public class EXUpdatesUpdate: NSObject {
     manifestHeaders: EXUpdatesManifestHeaders,
     extensions: [String: Any],
     config: EXUpdatesConfig,
-    database: EXUpdatesDatabase
+    database: UpdatesDatabase
   ) throws -> EXUpdatesUpdate {
     let protocolVersion = manifestHeaders.protocolVersion
     switch protocolVersion {
@@ -161,7 +161,7 @@ public class EXUpdatesUpdate: NSObject {
   public static func update(
     withEmbeddedManifest: [String: Any],
     config: EXUpdatesConfig,
-    database: EXUpdatesDatabase?
+    database: UpdatesDatabase?
   ) -> EXUpdatesUpdate {
     if withEmbeddedManifest["releaseId"] != nil {
       return EXUpdatesLegacyUpdate.update(

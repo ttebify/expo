@@ -419,7 +419,7 @@ NS_ASSUME_NONNULL_BEGIN
   _selectionPolicy = [[EXUpdatesSelectionPolicy alloc]
                       initWithLauncherSelectionPolicy:[[EXUpdatesLauncherSelectionPolicyFilterAware alloc] initWithRuntimeVersions:sdkVersions]
                       loaderSelectionPolicy:[EXUpdatesLoaderSelectionPolicyFilterAware new]
-                      reaperSelectionPolicy:[EXUpdatesReaperSelectionPolicyDevelopmentClient new]];
+                      reaperSelectionPolicy:[UpdatesReaperSelectionPolicyDevelopmentClient new]];
 
   EXUpdatesAppLoaderTask *loaderTask = [[EXUpdatesAppLoaderTask alloc] initWithConfig:_config
                                                                              database:updatesDatabaseManager.database
@@ -454,7 +454,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (_appLauncher.launchedUpdate) {
     EXUpdatesDatabaseManager *updatesDatabaseManager = [EXKernel sharedInstance].serviceRegistry.updatesDatabaseManager;
-    [EXUpdatesReaper reapUnusedUpdatesWithConfig:_config
+    [UpdatesReaper reapUnusedUpdatesWithConfig:_config
                                         database:updatesDatabaseManager.database
                                        directory:updatesDatabaseManager.updatesDirectory
                                  selectionPolicy:_selectionPolicy

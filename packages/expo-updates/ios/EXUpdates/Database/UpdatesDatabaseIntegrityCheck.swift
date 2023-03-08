@@ -2,9 +2,9 @@
 
 import Foundation
 
-internal class EXUpdatesDatabaseIntegrityCheck {
+internal class UpdatesDatabaseIntegrityCheck {
   public func run(
-    withDatabase database: EXUpdatesDatabase,
+    withDatabase database: UpdatesDatabase,
     directory: URL,
     config: EXUpdatesConfig,
     embeddedUpdate: EXUpdatesUpdate?

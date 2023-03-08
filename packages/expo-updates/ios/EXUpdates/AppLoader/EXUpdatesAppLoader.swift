@@ -29,7 +29,7 @@ public class EXUpdatesAppLoader: NSObject {
   private static let EXUpdatesAppLoaderErrorDomain = "EXUpdatesAppLoader"
 
   internal let config: EXUpdatesConfig
-  internal let database: EXUpdatesDatabase
+  internal let database: UpdatesDatabase
   internal let directory: URL
   internal let launchedUpdate: EXUpdatesUpdate?
 
@@ -48,7 +48,7 @@ public class EXUpdatesAppLoader: NSObject {
   private let arrayLock: NSLock = NSLock()
   private let completionQueue: DispatchQueue
 
-  public required init(config: EXUpdatesConfig, database: EXUpdatesDatabase, directory: URL, launchedUpdate: EXUpdatesUpdate?, completionQueue: DispatchQueue) {
+  public required init(config: EXUpdatesConfig, database: UpdatesDatabase, directory: URL, launchedUpdate: EXUpdatesUpdate?, completionQueue: DispatchQueue) {
     self.config = config
     self.database = database
     self.directory = directory

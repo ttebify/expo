@@ -171,7 +171,7 @@ public final class EXUpdatesDevLauncherController: NSObject, EXUpdatesExternalIn
     controller.defaultSelectionPolicy = EXUpdatesSelectionPolicy(
       launcherSelectionPolicy: currentSelectionPolicy.launcherSelectionPolicy,
       loaderSelectionPolicy: currentSelectionPolicy.loaderSelectionPolicy,
-      reaperSelectionPolicy: EXUpdatesReaperSelectionPolicyDevelopmentClient()
+      reaperSelectionPolicy: UpdatesReaperSelectionPolicyDevelopmentClient()
     )
     controller.resetSelectionPolicyToDefault()
   }

@@ -16,7 +16,7 @@ internal final class EXUpdatesRemoteAppLoader: EXUpdatesAppLoader {
 
   public required init(
     config: EXUpdatesConfig,
-    database: EXUpdatesDatabase,
+    database: UpdatesDatabase,
     directory: URL,
     launchedUpdate: EXUpdatesUpdate?,
     completionQueue: DispatchQueue

@@ -42,7 +42,7 @@ class EXUpdatesSelectionPolicyFilterAwareSpec : ExpoSpec {
         EXUpdatesConfig.EXUpdatesConfigRuntimeVersionKey: runtimeVersion,
         EXUpdatesConfig.EXUpdatesConfigScopeKeyKey: scopeKey
       ])
-      let database = EXUpdatesDatabase()
+      let database = UpdatesDatabase()
       let manifestHeaders = EXUpdatesManifestHeaders(
         protocolVersion: nil,
         serverDefinedHeaders: nil,

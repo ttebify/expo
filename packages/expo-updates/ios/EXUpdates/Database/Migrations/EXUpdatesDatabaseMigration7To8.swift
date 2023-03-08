@@ -13,7 +13,7 @@ internal final class EXUpdatesDatabaseMigration7To8: EXUpdatesDatabaseMigration 
     """
 
     guard sqlite3_exec(db, String(sql.utf8), nil, nil, nil) == SQLITE_OK else {
-      throw EXUpdatesDatabaseMigrationError.migrationSQLError
+      throw UpdatesDatabaseMigrationError.migrationSQLError
     }
   }
 }

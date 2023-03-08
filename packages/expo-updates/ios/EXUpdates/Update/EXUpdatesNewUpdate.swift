@@ -15,7 +15,7 @@ internal final class EXUpdatesNewUpdate: EXUpdatesUpdate {
     manifestHeaders: EXUpdatesManifestHeaders,
     extensions: [String: Any],
     config: EXUpdatesConfig,
-    database: EXUpdatesDatabase
+    database: UpdatesDatabase
   ) -> EXUpdatesUpdate {
     let manifest = withNewManifest
     let assetHeaders: [String: Any] = extensions.optionalValue(forKey: "assetRequestHeaders") ?? [:]

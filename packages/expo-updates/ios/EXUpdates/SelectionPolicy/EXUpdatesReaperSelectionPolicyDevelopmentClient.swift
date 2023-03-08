@@ -3,14 +3,14 @@
 import Foundation
 
 /**
- * An EXUpdatesReaperSelectionPolicy which keeps a predefined maximum number of updates across all scopes,
+ * An UpdatesReaperSelectionPolicy which keeps a predefined maximum number of updates across all scopes,
  * and, once that number is surpassed, selects the updates least recently accessed (and then least
  * recently published) to delete. Ignores filters and scopes.
  *
  * Uses the `lastAccessed` property to determine ordering of updates.
  */
 @objcMembers
-public final class EXUpdatesReaperSelectionPolicyDevelopmentClient: NSObject, EXUpdatesReaperSelectionPolicy {
+public final class UpdatesReaperSelectionPolicyDevelopmentClient: NSObject, UpdatesReaperSelectionPolicy {
   private let maxUpdatesToKeep: Int
 
   public override init() {
@@ -23,7 +23,7 @@ public final class EXUpdatesReaperSelectionPolicyDevelopmentClient: NSObject, EX
     if maxUpdatesToKeep <= 0 {
       NSException.init(
         name: .invalidArgumentException,
-        reason: "Cannot initiailize EXUpdatesReaperSelectionPolicy with maxUpdatesToKeep <= 0"
+        reason: "Cannot initiailize UpdatesReaperSelectionPolicy with maxUpdatesToKeep <= 0"
       )
       .raise()
     }
@@ -52,7 +52,7 @@ public final class EXUpdatesReaperSelectionPolicyDevelopmentClient: NSObject, EX
           // avoid infinite loop
           NSException.init(
             name: .internalInconsistencyException,
-            reason: "Multiple updates with the same ID were passed into EXUpdatesReaperSelectionPolicyDevelopmentClient"
+            reason: "Multiple updates with the same ID were passed into UpdatesReaperSelectionPolicyDevelopmentClient"
           )
           .raise()
         }

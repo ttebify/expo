@@ -39,14 +39,14 @@ public class EXUpdatesAppLauncherWithDatabase: NSObject, EXUpdatesAppLauncher {
   private let launcherQueue: DispatchQueue
   private var completedAssets: Int
   private let config: EXUpdatesConfig
-  private let database: EXUpdatesDatabase
+  private let database: UpdatesDatabase
   private let directory: URL
   public private(set) var completionQueue: DispatchQueue
   public private(set) var completion: EXUpdatesAppLauncherCompletionBlock?
 
   private var launchAssetError: Error?
 
-  public required init(config: EXUpdatesConfig, database: EXUpdatesDatabase, directory: URL, completionQueue: DispatchQueue) {
+  public required init(config: EXUpdatesConfig, database: UpdatesDatabase, directory: URL, completionQueue: DispatchQueue) {
     self.launcherQueue = DispatchQueue(label: "expo.launcher.LauncherQueue")
     self.completedAssets = 0
     self.config = config
@@ -61,7 +61,7 @@ public class EXUpdatesAppLauncherWithDatabase: NSObject, EXUpdatesAppLauncher {
 
   public static func launchableUpdate(
     withConfig config: EXUpdatesConfig,
-    database: EXUpdatesDatabase,
+    database: UpdatesDatabase,
     selectionPolicy: EXUpdatesSelectionPolicy,
     completionQueue: DispatchQueue,
     completion: @escaping EXUpdatesAppLauncherUpdateCompletionBlock
@@ -159,7 +159,7 @@ public class EXUpdatesAppLauncherWithDatabase: NSObject, EXUpdatesAppLauncher {
   }
 
   public static func storedUpdateIds(
-    inDatabase database: EXUpdatesDatabase,
+    inDatabase database: UpdatesDatabase,
     completion: @escaping EXUpdatesAppLauncherQueryCompletionBlock
   ) {
     database.databaseQueue.async {

@@ -37,7 +37,7 @@ enum EXUpdatesDatabaseHashType: Int {
  *
  * SQLite allows a many-to-many relationship between updates and assets, which means we can keep
  * only one copy of each asset on disk at a time while also being able to clear unused assets with
- * relative ease (see EXUpdatesReaper).
+ * relative ease (see UpdatesReaper).
  *
  * Occasionally it's necessary to add migrations when the data structures for updates or assets must
  * change. Extra care must be taken here, since these migrations will happen on users' devices for
@@ -48,13 +48,14 @@ enum EXUpdatesDatabaseHashType: Int {
  * EXUpdatesDatabase provides a serial queue on which all database operations must be run (methods
  * in this class will assert). This is primarily for control over what high-level operations
  * involving the database can occur simultaneously - e.g. we don't want to be trying to download a
- * new update at the same time EXUpdatesReaper is running.
+ * new update at the same time UpdatesReaper is running.
  *
  * The `scopeKey` field in various methods here is only relevant in environments such as Expo Go in
  * which updates from multiple scopes can be launched.
  */
+@objc(EXUpdatesDatabase)
 @objcMembers
-public final class EXUpdatesDatabase: NSObject {
+public final class UpdatesDatabase: NSObject {
   private static let ManifestFiltersKey = "manifestFilters"
   private static let ServerDefinedHeadersKey = "serverDefinedHeaders"
   private static let StaticBuildDataKey = "staticBuildData"
@@ -72,7 +73,7 @@ public final class EXUpdatesDatabase: NSObject {
 
   public func openDatabase(inDirectory directory: URL) throws {
     dispatchPrecondition(condition: .onQueue(databaseQueue))
-    db = try EXUpdatesDatabaseInitialization.initializeDatabaseWithLatestSchema(inDirectory: directory)
+    db = try UpdatesDatabaseInitialization.initializeDatabaseWithLatestSchema(inDirectory: directory)
   }
 
   public func closeDatabase() {
@@ -82,7 +83,7 @@ public final class EXUpdatesDatabase: NSObject {
 
   public func execute(sql: String, withArgs args: [Any?]?) throws -> [[String: Any?]] {
     dispatchPrecondition(condition: .onQueue(databaseQueue))
-    return try EXUpdatesDatabaseUtils.execute(sql: sql, withArgs: args, onDatabase: db.require("Missing database handle"))
+    return try UpdatesDatabaseUtils.execute(sql: sql, withArgs: args, onDatabase: db.require("Missing database handle"))
   }
 
   public func executeForObjC(sql: String, withArgs args: [Any]?) throws -> [Any] {
@@ -509,27 +510,27 @@ public final class EXUpdatesDatabase: NSObject {
   }
 
   public func serverDefinedHeaders(withScopeKey scopeKey: String) throws -> [String: Any]? {
-    return try jsonData(withKey: EXUpdatesDatabase.ServerDefinedHeadersKey, scopeKey: scopeKey)
+    return try jsonData(withKey: UpdatesDatabase.ServerDefinedHeadersKey, scopeKey: scopeKey)
   }
 
   public func manifestFilters(withScopeKey scopeKey: String) throws -> [String: Any]? {
-    return try jsonData(withKey: EXUpdatesDatabase.ManifestFiltersKey, scopeKey: scopeKey)
+    return try jsonData(withKey: UpdatesDatabase.ManifestFiltersKey, scopeKey: scopeKey)
   }
 
   public func staticBuildData(withScopeKey scopeKey: String) throws -> [String: Any]? {
-    return try jsonData(withKey: EXUpdatesDatabase.StaticBuildDataKey, scopeKey: scopeKey)
+    return try jsonData(withKey: UpdatesDatabase.StaticBuildDataKey, scopeKey: scopeKey)
   }
 
   public func setServerDefinedHeaders(_ serverDefinedHeaders: [String: Any], withScopeKey scopeKey: String) throws {
-    return try setJsonData(serverDefinedHeaders, withKey: EXUpdatesDatabase.ServerDefinedHeadersKey, scopeKey: scopeKey, isInTransaction: false)
+    return try setJsonData(serverDefinedHeaders, withKey: UpdatesDatabase.ServerDefinedHeadersKey, scopeKey: scopeKey, isInTransaction: false)
   }
 
   public func setManifestFilters(_ manifestFilters: [String: Any], withScopeKey scopeKey: String) throws {
-    return try setJsonData(manifestFilters, withKey: EXUpdatesDatabase.ManifestFiltersKey, scopeKey: scopeKey, isInTransaction: false)
+    return try setJsonData(manifestFilters, withKey: UpdatesDatabase.ManifestFiltersKey, scopeKey: scopeKey, isInTransaction: false)
   }
 
   public func setStaticBuildData(_ staticBuildData: [String: Any], withScopeKey scopeKey: String) throws {
-    return try setJsonData(staticBuildData, withKey: EXUpdatesDatabase.StaticBuildDataKey, scopeKey: scopeKey, isInTransaction: false)
+    return try setJsonData(staticBuildData, withKey: UpdatesDatabase.StaticBuildDataKey, scopeKey: scopeKey, isInTransaction: false)
   }
 
   public func setMetadata(withManifest updateManifest: EXUpdatesUpdate) throws {
@@ -537,7 +538,7 @@ public final class EXUpdatesDatabase: NSObject {
 
     if let serverDefinedHeaders = updateManifest.serverDefinedHeaders {
       do {
-        _ = try setJsonData(serverDefinedHeaders, withKey: EXUpdatesDatabase.ServerDefinedHeadersKey, scopeKey: updateManifest.scopeKey, isInTransaction: true)
+        _ = try setJsonData(serverDefinedHeaders, withKey: UpdatesDatabase.ServerDefinedHeadersKey, scopeKey: updateManifest.scopeKey, isInTransaction: true)
       } catch {
         sqlite3_exec(db, "ROLLBACK;", nil, nil, nil)
         throw EXUpdatesDatabaseError.setJsonDataError
@@ -546,7 +547,7 @@ public final class EXUpdatesDatabase: NSObject {
 
     if let manifestFilters = updateManifest.manifestFilters {
       do {
-        _ = try setJsonData(manifestFilters, withKey: EXUpdatesDatabase.ManifestFiltersKey, scopeKey: updateManifest.scopeKey, isInTransaction: true)
+        _ = try setJsonData(manifestFilters, withKey: UpdatesDatabase.ManifestFiltersKey, scopeKey: updateManifest.scopeKey, isInTransaction: true)
       } catch {
         sqlite3_exec(db, "ROLLBACK;", nil, nil, nil)
         throw EXUpdatesDatabaseError.setJsonDataError
@@ -574,14 +575,14 @@ public final class EXUpdatesDatabase: NSObject {
       database: self,
       updateId: row.requiredValue(forKey: "id"),
       scopeKey: row.requiredValue(forKey: "scope_key"),
-      commitTime: EXUpdatesDatabaseUtils.date(fromUnixTimeMilliseconds: row.requiredValue(forKey: "commit_time")),
+      commitTime: UpdatesDatabaseUtils.date(fromUnixTimeMilliseconds: row.requiredValue(forKey: "commit_time")),
       runtimeVersion: row.requiredValue(forKey: "runtime_version"),
       keep: keep.intValue != 0,
       status: EXUpdatesUpdateStatus.init(rawValue: status.intValue)!,
       isDevelopmentMode: false,
       assetsFromManifest: nil
     )
-    update.lastAccessed = EXUpdatesDatabaseUtils.date(fromUnixTimeMilliseconds: row.requiredValue(forKey: "last_accessed"))
+    update.lastAccessed = UpdatesDatabaseUtils.date(fromUnixTimeMilliseconds: row.requiredValue(forKey: "last_accessed"))
     update.successfulLaunchCount = successfulLaunchCount.intValue
     update.failedLaunchCount = failedLaunchCount.intValue
     return update
@@ -619,7 +620,7 @@ public final class EXUpdatesDatabase: NSObject {
     asset.assetId = assetId.intValue
     asset.url = url
     asset.extraRequestHeaders = extraRequestHeaders
-    asset.downloadTime = EXUpdatesDatabaseUtils.date(fromUnixTimeMilliseconds: row.requiredValue(forKey: "download_time"))
+    asset.downloadTime = UpdatesDatabaseUtils.date(fromUnixTimeMilliseconds: row.requiredValue(forKey: "download_time"))
     asset.filename = row.requiredValue(forKey: "relative_path")
     asset.contentHash = row.requiredValue(forKey: "hash")
     asset.expectedHash = row.optionalValue(forKey: "expected_hash")

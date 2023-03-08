@@ -16,7 +16,7 @@ import Foundation
  * The three methods are individually pluggable to allow for different behavior of specific parts of
  * the module in different situations. For example, in a development client, our policy for
  * retaining and deleting updates is different than in a release build, so we use a different
- * implementation of EXUpdatesReaperSelectionPolicy.
+ * implementation of UpdatesReaperSelectionPolicy.
  *
  * Importantly (and non-trivially), expo-updates must be able to make all these determinations
  * without talking to any server. This is because the embedded update can change at any time,
@@ -25,15 +25,15 @@ import Foundation
  * update to launch in that case.
  */
 @objcMembers
-public final class EXUpdatesSelectionPolicy: NSObject, EXUpdatesLauncherSelectionPolicy, EXUpdatesLoaderSelectionPolicy, EXUpdatesReaperSelectionPolicy {
+public final class EXUpdatesSelectionPolicy: NSObject, EXUpdatesLauncherSelectionPolicy, EXUpdatesLoaderSelectionPolicy, UpdatesReaperSelectionPolicy {
   public let launcherSelectionPolicy: EXUpdatesLauncherSelectionPolicy
   public let loaderSelectionPolicy: EXUpdatesLoaderSelectionPolicy
-  public let reaperSelectionPolicy: EXUpdatesReaperSelectionPolicy
+  public let reaperSelectionPolicy: UpdatesReaperSelectionPolicy
 
   public required init(
     launcherSelectionPolicy: EXUpdatesLauncherSelectionPolicy,
     loaderSelectionPolicy: EXUpdatesLoaderSelectionPolicy,
-    reaperSelectionPolicy: EXUpdatesReaperSelectionPolicy
+    reaperSelectionPolicy: UpdatesReaperSelectionPolicy
   ) {
     self.launcherSelectionPolicy = launcherSelectionPolicy
     self.loaderSelectionPolicy = loaderSelectionPolicy

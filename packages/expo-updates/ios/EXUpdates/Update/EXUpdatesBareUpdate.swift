@@ -14,7 +14,7 @@ internal final class EXUpdatesBareUpdate: EXUpdatesUpdate {
   public static func update(
     withBareManifest: EXManifestsBareManifest,
     config: EXUpdatesConfig,
-    database: EXUpdatesDatabase?
+    database: UpdatesDatabase?
   ) -> EXUpdatesUpdate {
     let manifest = withBareManifest
 

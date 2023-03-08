@@ -12,7 +12,7 @@ public final class EXUpdatesSelectionPolicyFactory: NSObject {
     return EXUpdatesSelectionPolicy.init(
       launcherSelectionPolicy: EXUpdatesLauncherSelectionPolicyFilterAware.init(runtimeVersion: runtimeVersion),
       loaderSelectionPolicy: EXUpdatesLoaderSelectionPolicyFilterAware(),
-      reaperSelectionPolicy: EXUpdatesReaperSelectionPolicyFilterAware()
+      reaperSelectionPolicy: UpdatesReaperSelectionPolicyFilterAware()
     )
   }
 
@@ -20,7 +20,7 @@ public final class EXUpdatesSelectionPolicyFactory: NSObject {
     return EXUpdatesSelectionPolicy.init(
       launcherSelectionPolicy: EXUpdatesLauncherSelectionPolicyFilterAware.init(runtimeVersions: runtimeVersions),
       loaderSelectionPolicy: EXUpdatesLoaderSelectionPolicyFilterAware(),
-      reaperSelectionPolicy: EXUpdatesReaperSelectionPolicyFilterAware()
+      reaperSelectionPolicy: UpdatesReaperSelectionPolicyFilterAware()
     )
   }
 }

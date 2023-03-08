@@ -8,7 +8,7 @@
 import Foundation
 import SQLite3
 
-enum EXUpdatesDatabaseInitializationError: Error {
+enum UpdatesDatabaseInitializationError: Error {
   case migrateAndRemoveOldDatabaseFailure
   case moveExistingCorruptedDatabaseFailure
   case openAfterMovingCorruptedDatabaseFailure
@@ -20,7 +20,7 @@ enum EXUpdatesDatabaseInitializationError: Error {
 /**
  * Utility class that handles database initialization and migration.
  */
-internal final class EXUpdatesDatabaseInitialization {
+internal final class UpdatesDatabaseInitialization {
   private static let LatestFilename = "expo-v9.db"
   private static let LatestSchema = """
     CREATE TABLE "updates" (
@@ -104,7 +104,7 @@ internal final class EXUpdatesDatabaseInitialization {
         do {
           try FileManager.default.removeItem(atPath: dbUrl.path)
         } catch {
-          throw EXUpdatesDatabaseInitializationError.migrateAndRemoveOldDatabaseFailure
+          throw UpdatesDatabaseInitializationError.migrateAndRemoveOldDatabaseFailure
         }
       }
       shouldInitializeDatabaseSchema = true
@@ -116,11 +116,11 @@ internal final class EXUpdatesDatabaseInitialization {
     let resultCode = sqlite3_open(String(dbUrl.path.utf8), &dbInit)
 
     guard var db = dbInit else {
-      throw EXUpdatesDatabaseInitializationError.openDatabaseFalure
+      throw UpdatesDatabaseInitializationError.openDatabaseFalure
     }
 
     if resultCode != SQLITE_OK {
-      NSLog("Error opening SQLite db: %@", [EXUpdatesDatabaseUtils.errorCodesAndMessage(fromSqlite: db).message])
+      NSLog("Error opening SQLite db: %@", [UpdatesDatabaseUtils.errorCodesAndMessage(fromSqlite: db).message])
       sqlite3_close(db)
 
       if resultCode == SQLITE_CORRUPT || resultCode == SQLITE_NOTADB {
@@ -129,36 +129,36 @@ internal final class EXUpdatesDatabaseInitialization {
         do {
           try FileManager.default.moveItem(at: dbUrl, to: destinationUrl)
         } catch {
-          throw EXUpdatesDatabaseInitializationError.moveExistingCorruptedDatabaseFailure
+          throw UpdatesDatabaseInitializationError.moveExistingCorruptedDatabaseFailure
         }
 
         NSLog("Moved corrupt SQLite db to %@", archivedDbFilename)
         var dbInit2: OpaquePointer?
         guard sqlite3_open(String(dbUrl.absoluteString.utf8), &dbInit2) == SQLITE_OK else {
-          throw EXUpdatesDatabaseInitializationError.openAfterMovingCorruptedDatabaseFailure
+          throw UpdatesDatabaseInitializationError.openAfterMovingCorruptedDatabaseFailure
         }
 
         guard let db2 = dbInit2 else {
-          throw EXUpdatesDatabaseInitializationError.openDatabaseFalure
+          throw UpdatesDatabaseInitializationError.openDatabaseFalure
         }
         db = db2
 
         shouldInitializeDatabaseSchema = true
       } else {
-        throw EXUpdatesDatabaseInitializationError.openInitialDatabaseOtherFailure
+        throw UpdatesDatabaseInitializationError.openInitialDatabaseOtherFailure
       }
     }
 
     // foreign keys must be turned on explicitly for each database connection
     do {
-      _ = try EXUpdatesDatabaseUtils.execute(sql: "PRAGMA foreign_keys=ON;", withArgs: nil, onDatabase: db)
+      _ = try UpdatesDatabaseUtils.execute(sql: "PRAGMA foreign_keys=ON;", withArgs: nil, onDatabase: db)
     } catch {
       NSLog("Error turning on foreign key constraint: %@", [error.localizedDescription])
     }
 
     if shouldInitializeDatabaseSchema {
       guard sqlite3_exec(db, String(schema.utf8), nil, nil, nil) == SQLITE_OK else {
-        throw EXUpdatesDatabaseInitializationError.databseSchemaInitializationFailure
+        throw UpdatesDatabaseInitializationError.databseSchemaInitializationFailure
       }
     }
 
@@ -196,7 +196,7 @@ internal final class EXUpdatesDatabaseInitialization {
 
     var db: OpaquePointer?
     if sqlite3_open(String(latestURL.absoluteString.utf8), &db) != SQLITE_OK {
-      NSLog("Error opening migrated SQLite db: %@", [EXUpdatesDatabaseUtils.errorCodesAndMessage(fromSqlite: db!).message])
+      NSLog("Error opening migrated SQLite db: %@", [UpdatesDatabaseUtils.errorCodesAndMessage(fromSqlite: db!).message])
       sqlite3_close(db)
       return false
     }
@@ -206,7 +206,7 @@ internal final class EXUpdatesDatabaseInitialization {
       do {
         try migration.runMigration(onDatabase: db!)
       } catch {
-        NSLog("Error migrating SQLite db: %@", [EXUpdatesDatabaseUtils.errorCodesAndMessage(fromSqlite: db!).message])
+        NSLog("Error migrating SQLite db: %@", [UpdatesDatabaseUtils.errorCodesAndMessage(fromSqlite: db!).message])
         sqlite3_close(db)
         return false
       }

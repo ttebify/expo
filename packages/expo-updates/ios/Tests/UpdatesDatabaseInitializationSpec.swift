@@ -233,7 +233,7 @@ let EXUpdatesDatabaseV8Schema = """
   CREATE INDEX "index_json_data_scope_key" ON "json_data" ("scope_key");
 """
 
-class EXUpdatesDatabaseInitializationSpec : ExpoSpec {
+class UpdatesDatabaseInitializationSpec : ExpoSpec {
   override func spec() {
     var testDatabaseDir: URL!
 
@@ -250,22 +250,22 @@ class EXUpdatesDatabaseInitializationSpec : ExpoSpec {
 
     describe("database persistence") {
       it("persists") {
-        let db = try! EXUpdatesDatabaseInitialization.initializeDatabaseWithLatestSchema(inDirectory: testDatabaseDir)
+        let db = try! UpdatesDatabaseInitialization.initializeDatabaseWithLatestSchema(inDirectory: testDatabaseDir)
 
         // insert some test data
         let insertSql = """
           INSERT INTO "assets" ("url","key","headers","type","metadata","download_time","relative_path","hash","hash_type","marked_for_deletion")
             VALUES (NULL,'bundle-1614137401950',NULL,'js',NULL,1614137406588,'bundle-1614137401950','6ff4ee75b48a21c7a9ed98015ff6bfd0a47b94cd087c5e2258262e65af239952',0,0);
         """
-        _ = try! EXUpdatesDatabaseUtils.execute(sql: insertSql, withArgs: nil, onDatabase: db)
+        _ = try! UpdatesDatabaseUtils.execute(sql: insertSql, withArgs: nil, onDatabase: db)
 
         // mimic the app closing and reopening
         sqlite3_close(db)
-        let newDb = try! EXUpdatesDatabaseInitialization.initializeDatabaseWithLatestSchema(inDirectory: testDatabaseDir)
+        let newDb = try! UpdatesDatabaseInitialization.initializeDatabaseWithLatestSchema(inDirectory: testDatabaseDir)
 
         // ensure the data is still there
         let selectSql = "SELECT * FROM `assets` WHERE `url` IS NULL AND `key` = 'bundle-1614137401950' AND `headers` IS NULL AND `type` = 'js' AND `metadata` IS NULL AND `download_time` = 1614137406588 AND `relative_path` = 'bundle-1614137401950' AND `hash` = '6ff4ee75b48a21c7a9ed98015ff6bfd0a47b94cd087c5e2258262e65af239952' AND `hash_type` = 0 AND `marked_for_deletion` = 0"
-        let rows = try! EXUpdatesDatabaseUtils.execute(sql: selectSql, withArgs: nil, onDatabase: newDb)
+        let rows = try! UpdatesDatabaseUtils.execute(sql: selectSql, withArgs: nil, onDatabase: newDb)
         expect(rows.count) == 1
         expect((rows[0]["id"] as? NSNumber)?.intValue) == 1
       }
@@ -275,7 +275,7 @@ class EXUpdatesDatabaseInitializationSpec : ExpoSpec {
       it("migrates 4 to latest") {
         // this test just does some simple data validation to make sure the database persists across all migrations
         // individual migrations are tested in more detail individually
-        let db = try! EXUpdatesDatabaseInitialization.initializeDatabase(
+        let db = try! UpdatesDatabaseInitialization.initializeDatabase(
           withSchema: EXUpdatesDatabaseV4Schema,
           filename: "expo-v4.db",
           inDirectory: testDatabaseDir,
@@ -302,43 +302,43 @@ class EXUpdatesDatabaseInitializationSpec : ExpoSpec {
             (X'594100ea066e4804b5c7c907c773f980',4);
         """
 
-        _ = try! EXUpdatesDatabaseUtils.execute(sql: insertAssetsSql, withArgs: nil, onDatabase: db)
-        _ = try! EXUpdatesDatabaseUtils.execute(sql: insertUpdatesSql, withArgs: nil, onDatabase: db)
-        _ = try! EXUpdatesDatabaseUtils.execute(sql: insertUpdatesAssetsSql, withArgs: nil, onDatabase: db)
+        _ = try! UpdatesDatabaseUtils.execute(sql: insertAssetsSql, withArgs: nil, onDatabase: db)
+        _ = try! UpdatesDatabaseUtils.execute(sql: insertUpdatesSql, withArgs: nil, onDatabase: db)
+        _ = try! UpdatesDatabaseUtils.execute(sql: insertUpdatesAssetsSql, withArgs: nil, onDatabase: db)
         sqlite3_close(db)
 
         // initialize without specifying migrations in order to run them all
-        let migratedDb = try! EXUpdatesDatabaseInitialization.initializeDatabaseWithLatestSchema(inDirectory: testDatabaseDir)
+        let migratedDb = try! UpdatesDatabaseInitialization.initializeDatabaseWithLatestSchema(inDirectory: testDatabaseDir)
 
         // verify data integrity
         let updatesSql1 = "SELECT * FROM `updates` WHERE `id` = X'8C263F9DE3FF48888496E3244C788661'"
-        expect(try! EXUpdatesDatabaseUtils.execute(sql:updatesSql1, withArgs:nil, onDatabase:migratedDb).count) == 1
+        expect(try! UpdatesDatabaseUtils.execute(sql:updatesSql1, withArgs:nil, onDatabase:migratedDb).count) == 1
         let updatesSql2 = "SELECT * FROM `updates` WHERE `id` = X'594100ea066e4804b5c7c907c773f980'"
-        expect(try! EXUpdatesDatabaseUtils.execute(sql:updatesSql2, withArgs:nil, onDatabase:migratedDb).count) == 1
+        expect(try! UpdatesDatabaseUtils.execute(sql:updatesSql2, withArgs:nil, onDatabase:migratedDb).count) == 1
 
         let assetsSql1 = "SELECT * FROM `assets` WHERE `id` = 2"
-        expect(try! EXUpdatesDatabaseUtils.execute(sql:assetsSql1, withArgs:nil, onDatabase:migratedDb).count) == 1
+        expect(try! UpdatesDatabaseUtils.execute(sql:assetsSql1, withArgs:nil, onDatabase:migratedDb).count) == 1
         let assetsSql2 = "SELECT * FROM `assets` WHERE `id` = 3"
-        expect(try! EXUpdatesDatabaseUtils.execute(sql:assetsSql2, withArgs:nil, onDatabase:migratedDb).count) == 1
+        expect(try! UpdatesDatabaseUtils.execute(sql:assetsSql2, withArgs:nil, onDatabase:migratedDb).count) == 1
         let assetsSql3 = "SELECT * FROM `assets` WHERE `id` = 4"
-        expect(try! EXUpdatesDatabaseUtils.execute(sql:assetsSql3, withArgs:nil, onDatabase:migratedDb).count) == 1
+        expect(try! UpdatesDatabaseUtils.execute(sql:assetsSql3, withArgs:nil, onDatabase:migratedDb).count) == 1
 
         let updatesAssetsSql1 = "SELECT * FROM `updates_assets` WHERE `update_id` = X'8C263F9DE3FF48888496E3244C788661' AND `asset_id` = 2"
-        expect(try! EXUpdatesDatabaseUtils.execute(sql:updatesAssetsSql1, withArgs:nil, onDatabase:migratedDb).count) == 1
+        expect(try! UpdatesDatabaseUtils.execute(sql:updatesAssetsSql1, withArgs:nil, onDatabase:migratedDb).count) == 1
         let updatesAssetsSql2 = "SELECT * FROM `updates_assets` WHERE `update_id` = X'8C263F9DE3FF48888496E3244C788661' AND `asset_id` = 3"
-        expect(try! EXUpdatesDatabaseUtils.execute(sql:updatesAssetsSql2, withArgs:nil, onDatabase:migratedDb).count) == 1
+        expect(try! UpdatesDatabaseUtils.execute(sql:updatesAssetsSql2, withArgs:nil, onDatabase:migratedDb).count) == 1
         let updatesAssetsSql3 = "SELECT * FROM `updates_assets` WHERE `update_id` = X'594100ea066e4804b5c7c907c773f980' AND `asset_id` = 4"
-        expect(try! EXUpdatesDatabaseUtils.execute(sql:updatesAssetsSql3, withArgs:nil, onDatabase:migratedDb).count) == 1
+        expect(try! UpdatesDatabaseUtils.execute(sql:updatesAssetsSql3, withArgs:nil, onDatabase:migratedDb).count) == 1
 
         // make sure multiple migrations are running
         let lastAccessedSql = "SELECT DISTINCT `last_accessed` FROM `updates` WHERE `last_accessed` IS NOT NULL"
-        expect(try! EXUpdatesDatabaseUtils.execute(sql:lastAccessedSql, withArgs:nil, onDatabase:migratedDb).count) == 1
+        expect(try! UpdatesDatabaseUtils.execute(sql:lastAccessedSql, withArgs:nil, onDatabase:migratedDb).count) == 1
         let successfulLaunchCountSql = "SELECT * FROM `updates` WHERE `successful_launch_count` = 1"
-        expect(try! EXUpdatesDatabaseUtils.execute(sql:successfulLaunchCountSql, withArgs:nil, onDatabase:migratedDb).count) == 2
+        expect(try! UpdatesDatabaseUtils.execute(sql:successfulLaunchCountSql, withArgs:nil, onDatabase:migratedDb).count) == 2
       }
 
       it("migrates 4 to 5") {
-        let db = try! EXUpdatesDatabaseInitialization.initializeDatabase(
+        let db = try! UpdatesDatabaseInitialization.initializeDatabase(
           withSchema: EXUpdatesDatabaseV4Schema,
           filename: "expo-v4.db",
           inDirectory: testDatabaseDir,
@@ -364,33 +364,33 @@ class EXUpdatesDatabaseInitializationSpec : ExpoSpec {
             (X'8C263F9DE3FF48888496E3244C788661',3),
             (X'594100ea066e4804b5c7c907c773f980',4);
         """
-        _ = try! EXUpdatesDatabaseUtils.execute(sql:insertAssetsSql, withArgs:nil, onDatabase:db)
-        _ = try! EXUpdatesDatabaseUtils.execute(sql:insertUpdatesSql, withArgs:nil, onDatabase:db)
-        _ = try! EXUpdatesDatabaseUtils.execute(sql:insertUpdatesAssetsSql, withArgs:nil, onDatabase:db)
+        _ = try! UpdatesDatabaseUtils.execute(sql:insertAssetsSql, withArgs:nil, onDatabase:db)
+        _ = try! UpdatesDatabaseUtils.execute(sql:insertUpdatesSql, withArgs:nil, onDatabase:db)
+        _ = try! UpdatesDatabaseUtils.execute(sql:insertUpdatesAssetsSql, withArgs:nil, onDatabase:db)
 
         sqlite3_close(db)
 
-        let migratedDb = try! EXUpdatesDatabaseInitialization.initializeDatabaseWithLatestSchema(inDirectory: testDatabaseDir, migrations: [EXUpdatesDatabaseMigration4To5()])
+        let migratedDb = try! UpdatesDatabaseInitialization.initializeDatabaseWithLatestSchema(inDirectory: testDatabaseDir, migrations: [EXUpdatesDatabaseMigration4To5()])
 
         // verify data integrity
         let updatesSql1 = "SELECT * FROM `updates` WHERE `id` = X'8C263F9DE3FF48888496E3244C788661'"
-        expect(try! EXUpdatesDatabaseUtils.execute(sql:updatesSql1, withArgs:nil, onDatabase:migratedDb).count) == 1
+        expect(try! UpdatesDatabaseUtils.execute(sql:updatesSql1, withArgs:nil, onDatabase:migratedDb).count) == 1
         let updatesSql2 = "SELECT * FROM `updates` WHERE `id` = X'594100ea066e4804b5c7c907c773f980'"
-        expect(try! EXUpdatesDatabaseUtils.execute(sql:updatesSql2, withArgs:nil, onDatabase:migratedDb).count) == 1
+        expect(try! UpdatesDatabaseUtils.execute(sql:updatesSql2, withArgs:nil, onDatabase:migratedDb).count) == 1
 
         let assetsSql1 = "SELECT * FROM `assets` WHERE `id` = 2 AND `url` = 'https://url.to/b56cf690e0afa93bd4dc7756d01edd3e' AND `key` = 'b56cf690e0afa93bd4dc7756d01edd3e.png' AND `headers` IS NULL AND `type` = 'image/png' AND `metadata` IS NULL AND `download_time` = 1614137309295 AND `relative_path` = 'b56cf690e0afa93bd4dc7756d01edd3e.png' AND `hash` = 'c4fdfc2ec388025067a0f755bda7731a0a868a2be79c84509f4de4e40d23161b' AND `hash_type` = 0 AND `marked_for_deletion` = 0"
-        expect(try! EXUpdatesDatabaseUtils.execute(sql:assetsSql1, withArgs:nil, onDatabase:migratedDb).count) == 1
+        expect(try! UpdatesDatabaseUtils.execute(sql:assetsSql1, withArgs:nil, onDatabase:migratedDb).count) == 1
         let assetsSql2 = "SELECT * FROM `assets` WHERE `id` = 3 AND `url` = 'https://url.to/bundle-1614137308871' AND `key` = 'bundle-1614137308871' AND `headers` IS NULL AND `type` = 'application/javascript' AND `metadata` IS NULL AND `download_time` = 1614137309513 AND `relative_path` = 'bundle-1614137308871' AND `hash` = 'e4d658861e85e301fb89bcfc49c42738ebcc0f9d5c979e037556435f44a27aa2' AND `hash_type` = 0 AND `marked_for_deletion` = 0"
-        expect(try! EXUpdatesDatabaseUtils.execute(sql:assetsSql2, withArgs:nil, onDatabase:migratedDb).count) == 1
+        expect(try! UpdatesDatabaseUtils.execute(sql:assetsSql2, withArgs:nil, onDatabase:migratedDb).count) == 1
         let assetsSql3 = "SELECT * FROM `assets` WHERE `id` = 4 AND `url` IS NULL AND `key` = 'bundle-1614137401950' AND `headers` IS NULL AND `type` = 'js' AND `metadata` IS NULL AND `download_time` = 1614137406588 AND `relative_path` = 'bundle-1614137401950' AND `hash` = '6ff4ee75b48a21c7a9ed98015ff6bfd0a47b94cd087c5e2258262e65af239952' AND `hash_type` = 0 AND `marked_for_deletion` = 0"
-        expect(try! EXUpdatesDatabaseUtils.execute(sql:assetsSql3, withArgs:nil, onDatabase:migratedDb).count) == 1
+        expect(try! UpdatesDatabaseUtils.execute(sql:assetsSql3, withArgs:nil, onDatabase:migratedDb).count) == 1
 
         let updatesAssetsSql1 = "SELECT * FROM `updates_assets` WHERE `update_id` = X'8C263F9DE3FF48888496E3244C788661' AND `asset_id` = 2"
-        expect(try! EXUpdatesDatabaseUtils.execute(sql:updatesAssetsSql1, withArgs:nil, onDatabase:migratedDb).count) == 1
+        expect(try! UpdatesDatabaseUtils.execute(sql:updatesAssetsSql1, withArgs:nil, onDatabase:migratedDb).count) == 1
         let updatesAssetsSql2 = "SELECT * FROM `updates_assets` WHERE `update_id` = X'8C263F9DE3FF48888496E3244C788661' AND `asset_id` = 3"
-        expect(try! EXUpdatesDatabaseUtils.execute(sql:updatesAssetsSql2, withArgs:nil, onDatabase:migratedDb).count) == 1
+        expect(try! UpdatesDatabaseUtils.execute(sql:updatesAssetsSql2, withArgs:nil, onDatabase:migratedDb).count) == 1
         let updatesAssetsSql3 = "SELECT * FROM `updates_assets` WHERE `update_id` = X'594100ea066e4804b5c7c907c773f980' AND `asset_id` = 4"
-        expect(try! EXUpdatesDatabaseUtils.execute(sql:updatesAssetsSql3, withArgs:nil, onDatabase:migratedDb).count) == 1
+        expect(try! UpdatesDatabaseUtils.execute(sql:updatesAssetsSql3, withArgs:nil, onDatabase:migratedDb).count) == 1
 
         // make sure we can insert multiple assets with null keys
         let nullInsertSql = """
@@ -398,32 +398,32 @@ class EXUpdatesDatabaseInitializationSpec : ExpoSpec {
             (5,NULL,NULL,NULL,'js',NULL,1614137406589,'bundle-1614137401951','1234',0,0),\
             (6,NULL,NULL,NULL,'js',NULL,1614137406580,'bundle-1614137401952','5678',0,0);
         """
-        _ = try! EXUpdatesDatabaseUtils.execute(sql:nullInsertSql, withArgs:nil, onDatabase:migratedDb)
+        _ = try! UpdatesDatabaseUtils.execute(sql:nullInsertSql, withArgs:nil, onDatabase:migratedDb)
 
         // make sure foreign key constraint still works
         let foreignKeyInsertSql = "INSERT INTO `updates_assets` (`update_id`, `asset_id`) VALUES (X'594100ea066e4804b5c7c907c773f980', 5)"
         let foreignKeySelectSql = "SELECT * FROM `updates_assets` WHERE `update_id` = X'594100ea066e4804b5c7c907c773f980' AND `asset_id` = 5"
-        _ = try! EXUpdatesDatabaseUtils.execute(sql:foreignKeyInsertSql, withArgs:nil, onDatabase:migratedDb)
-        expect(try! EXUpdatesDatabaseUtils.execute(sql:foreignKeySelectSql, withArgs:nil, onDatabase:migratedDb).count) == 1
+        _ = try! UpdatesDatabaseUtils.execute(sql:foreignKeyInsertSql, withArgs:nil, onDatabase:migratedDb)
+        expect(try! UpdatesDatabaseUtils.execute(sql:foreignKeySelectSql, withArgs:nil, onDatabase:migratedDb).count) == 1
 
         let foreignKeyInsertBadSql = "INSERT INTO `updates_assets` (`update_id`, `asset_id`) VALUES (X'594100ea066e4804b5c7c907c773f980', 13)"
         
         expect {
-          try EXUpdatesDatabaseUtils.execute(sql:foreignKeyInsertBadSql, withArgs:nil, onDatabase:migratedDb)
-        }.to(throwError(errorType: EXUpdatesDatabaseUtilsError.self) { error in
+          try UpdatesDatabaseUtils.execute(sql:foreignKeyInsertBadSql, withArgs:nil, onDatabase:migratedDb)
+        }.to(throwError(errorType: UpdatesDatabaseUtilsError.self) { error in
           expect(error.info?.extendedCode) == 787
         })
 
         // test on delete cascade
         let deleteSql = "DELETE FROM `assets` WHERE `id` = 5"
         let selectDeletedSql = "SELECT * FROM `updates_assets` WHERE `update_id` = X'594100ea066e4804b5c7c907c773f980' AND `asset_id` = 5"
-        _ = try! EXUpdatesDatabaseUtils.execute(sql:deleteSql, withArgs:nil, onDatabase:migratedDb)
-        expect(try! EXUpdatesDatabaseUtils.execute(sql:selectDeletedSql, withArgs:nil, onDatabase:migratedDb).count) == 0
+        _ = try! UpdatesDatabaseUtils.execute(sql:deleteSql, withArgs:nil, onDatabase:migratedDb)
+        expect(try! UpdatesDatabaseUtils.execute(sql:selectDeletedSql, withArgs:nil, onDatabase:migratedDb).count) == 0
       }
 
 
       it("migrates 5 to 6") {
-        let db = try! EXUpdatesDatabaseInitialization.initializeDatabase(
+        let db = try! UpdatesDatabaseInitialization.initializeDatabase(
           withSchema: EXUpdatesDatabaseV5Schema,
           filename: "expo-v5.db",
           inDirectory: testDatabaseDir,
@@ -449,54 +449,54 @@ class EXUpdatesDatabaseInitializationSpec : ExpoSpec {
             (X'8C263F9DE3FF48888496E3244C788661',3),
             (X'594100ea066e4804b5c7c907c773f980',4);
         """
-        _ = try! EXUpdatesDatabaseUtils.execute(sql:insertAssetsSql, withArgs:nil, onDatabase:db)
-        _ = try! EXUpdatesDatabaseUtils.execute(sql:insertUpdatesSql, withArgs:nil, onDatabase:db)
-        _ = try! EXUpdatesDatabaseUtils.execute(sql:insertUpdatesAssetsSql, withArgs:nil, onDatabase:db)
+        _ = try! UpdatesDatabaseUtils.execute(sql:insertAssetsSql, withArgs:nil, onDatabase:db)
+        _ = try! UpdatesDatabaseUtils.execute(sql:insertUpdatesSql, withArgs:nil, onDatabase:db)
+        _ = try! UpdatesDatabaseUtils.execute(sql:insertUpdatesAssetsSql, withArgs:nil, onDatabase:db)
 
         sqlite3_close(db)
 
         // initialize a new database object the normal way and run migrations
-        let migratedDb = try! EXUpdatesDatabaseInitialization.initializeDatabaseWithLatestSchema(
+        let migratedDb = try! UpdatesDatabaseInitialization.initializeDatabaseWithLatestSchema(
           inDirectory: testDatabaseDir,
           migrations: [EXUpdatesDatabaseMigration5To6()]
         )
 
         // verify data integrity
         let updatesSql1 = "SELECT * FROM `updates` WHERE `id` = X'8C263F9DE3FF48888496E3244C788661' AND `scope_key` = 'http://192.168.4.44:3000' AND `commit_time` = 1614137308871 AND `runtime_version` = '40.0.0' AND `launch_asset_id` = 3 AND `manifest` IS NOT NULL AND `status` = 1 AND `keep` = 1"
-        expect(try! EXUpdatesDatabaseUtils.execute(sql:updatesSql1, withArgs:nil, onDatabase:migratedDb).count) == 1
+        expect(try! UpdatesDatabaseUtils.execute(sql:updatesSql1, withArgs:nil, onDatabase:migratedDb).count) == 1
         let updatesSql2 = "SELECT * FROM `updates` WHERE `id` = X'594100ea066e4804b5c7c907c773f980' AND `scope_key` = 'http://192.168.4.44:3000' AND `commit_time` = 1614137401950 AND `runtime_version` = '40.0.0' AND `launch_asset_id` = 4 AND `manifest` IS NULL AND `status` = 1 AND `keep` = 1"
-        expect(try! EXUpdatesDatabaseUtils.execute(sql:updatesSql2, withArgs:nil, onDatabase:migratedDb).count) == 1
+        expect(try! UpdatesDatabaseUtils.execute(sql:updatesSql2, withArgs:nil, onDatabase:migratedDb).count) == 1
 
         let assetsSql1 = "SELECT * FROM `assets` WHERE `id` = 2 AND `url` = 'https://url.to/b56cf690e0afa93bd4dc7756d01edd3e' AND `key` = 'b56cf690e0afa93bd4dc7756d01edd3e.png' AND `headers` IS NULL AND `type` = 'image/png' AND `metadata` IS NULL AND `download_time` = 1614137309295 AND `relative_path` = 'b56cf690e0afa93bd4dc7756d01edd3e.png' AND `hash` = 'c4fdfc2ec388025067a0f755bda7731a0a868a2be79c84509f4de4e40d23161b' AND `hash_type` = 0 AND `marked_for_deletion` = 0"
-        expect(try! EXUpdatesDatabaseUtils.execute(sql:assetsSql1, withArgs:nil, onDatabase:migratedDb).count) == 1
+        expect(try! UpdatesDatabaseUtils.execute(sql:assetsSql1, withArgs:nil, onDatabase:migratedDb).count) == 1
         let assetsSql2 = "SELECT * FROM `assets` WHERE `id` = 3 AND `url` = 'https://url.to/bundle-1614137308871' AND `key` = 'bundle-1614137308871' AND `headers` IS NULL AND `type` = 'application/javascript' AND `metadata` IS NULL AND `download_time` = 1614137309513 AND `relative_path` = 'bundle-1614137308871' AND `hash` = 'e4d658861e85e301fb89bcfc49c42738ebcc0f9d5c979e037556435f44a27aa2' AND `hash_type` = 0 AND `marked_for_deletion` = 0"
-        expect(try! EXUpdatesDatabaseUtils.execute(sql:assetsSql2, withArgs:nil, onDatabase:migratedDb).count) == 1
+        expect(try! UpdatesDatabaseUtils.execute(sql:assetsSql2, withArgs:nil, onDatabase:migratedDb).count) == 1
         let assetsSql3 = "SELECT * FROM `assets` WHERE `id` = 4 AND `url` IS NULL AND `key` IS NULL AND `headers` IS NULL AND `type` = 'js' AND `metadata` IS NULL AND `download_time` = 1614137406588 AND `relative_path` = 'bundle-1614137401950' AND `hash` = '6ff4ee75b48a21c7a9ed98015ff6bfd0a47b94cd087c5e2258262e65af239952' AND `hash_type` = 0 AND `marked_for_deletion` = 0"
-        expect(try! EXUpdatesDatabaseUtils.execute(sql:assetsSql3, withArgs:nil, onDatabase:migratedDb).count) == 1
+        expect(try! UpdatesDatabaseUtils.execute(sql:assetsSql3, withArgs:nil, onDatabase:migratedDb).count) == 1
 
         let updatesAssetsSql1 = "SELECT * FROM `updates_assets` WHERE `update_id` = X'8C263F9DE3FF48888496E3244C788661' AND `asset_id` = 2"
-        expect(try! EXUpdatesDatabaseUtils.execute(sql:updatesAssetsSql1, withArgs:nil, onDatabase:migratedDb).count) == 1
+        expect(try! UpdatesDatabaseUtils.execute(sql:updatesAssetsSql1, withArgs:nil, onDatabase:migratedDb).count) == 1
         let updatesAssetsSql2 = "SELECT * FROM `updates_assets` WHERE `update_id` = X'8C263F9DE3FF48888496E3244C788661' AND `asset_id` = 3"
-        expect(try! EXUpdatesDatabaseUtils.execute(sql:updatesAssetsSql2, withArgs:nil, onDatabase:migratedDb).count) == 1
+        expect(try! UpdatesDatabaseUtils.execute(sql:updatesAssetsSql2, withArgs:nil, onDatabase:migratedDb).count) == 1
         let updatesAssetsSql3 = "SELECT * FROM `updates_assets` WHERE `update_id` = X'594100ea066e4804b5c7c907c773f980' AND `asset_id` = 4"
-        expect(try! EXUpdatesDatabaseUtils.execute(sql:updatesAssetsSql3, withArgs:nil, onDatabase:migratedDb).count) == 1
+        expect(try! UpdatesDatabaseUtils.execute(sql:updatesAssetsSql3, withArgs:nil, onDatabase:migratedDb).count) == 1
 
         // make sure metadata -> manifest column rename worked
         let updatesNonNullManifestSql = "SELECT * FROM `updates` WHERE `id` = X'8C263F9DE3FF48888496E3244C788661' AND `manifest` = '{\\\"metadata\\\":{\\\"updateGroup\\\":\\\"34993d39-57e6-46cf-8fa2-eba836f40828\\\",\\\"branchName\\\":\\\"rollout\\\"}}'"
-        expect(try! EXUpdatesDatabaseUtils.execute(sql:updatesNonNullManifestSql, withArgs:nil, onDatabase:migratedDb).count) == 1
+        expect(try! UpdatesDatabaseUtils.execute(sql:updatesNonNullManifestSql, withArgs:nil, onDatabase:migratedDb).count) == 1
 
         // make sure last_accessed column was filled in appropriately (all existing updates have the same last_accessed time)
         let lastAccessedSql1 = "SELECT DISTINCT last_accessed FROM `updates`"
-        expect(try! EXUpdatesDatabaseUtils.execute(sql:lastAccessedSql1, withArgs:nil, onDatabase:migratedDb).count) == 1
+        expect(try! UpdatesDatabaseUtils.execute(sql:lastAccessedSql1, withArgs:nil, onDatabase:migratedDb).count) == 1
 
         // make sure we can add new updates with different last_accessed times
         let lastAccessedSql2 = """
           INSERT INTO "updates" ("id","scope_key","commit_time","runtime_version","launch_asset_id","manifest","status","keep", "last_accessed") VALUES
             (X'8F06A50E5A68499F986CCA31EE159F81','https://exp.host/@esamelson/sdk41updates',1619133262732,'41.0.0',NULL,NULL,1,1,1619647642456)
         """
-        _ = try! EXUpdatesDatabaseUtils.execute(sql:lastAccessedSql2, withArgs:nil, onDatabase:migratedDb)
+        _ = try! UpdatesDatabaseUtils.execute(sql:lastAccessedSql2, withArgs:nil, onDatabase:migratedDb)
         let lastAccessedSql3 = "SELECT DISTINCT last_accessed FROM `updates`"
-        expect(try! EXUpdatesDatabaseUtils.execute(sql:lastAccessedSql3, withArgs:nil, onDatabase:migratedDb).count) == 2
+        expect(try! UpdatesDatabaseUtils.execute(sql:lastAccessedSql3, withArgs:nil, onDatabase:migratedDb).count) == 2
 
         // make sure foreign key constraints still work
 
@@ -505,35 +505,35 @@ class EXUpdatesDatabaseInitializationSpec : ExpoSpec {
           INSERT INTO "updates" ("id","scope_key","commit_time","runtime_version","launch_asset_id","manifest","status","keep", "last_accessed") VALUES  (X'E1AC9D5F55E041BBA5A9193DD1C1123A','https://exp.host/@esamelson/sdk41updates',1620168547318,'41.0.0',47,NULL,1,1,1619647642456)
         """
         expect {
-          try EXUpdatesDatabaseUtils.execute(sql:foreignKeyInsertBadSql1, withArgs:nil, onDatabase:migratedDb)
-        }.to(throwError(errorType: EXUpdatesDatabaseUtilsError.self) { error in
+          try UpdatesDatabaseUtils.execute(sql:foreignKeyInsertBadSql1, withArgs:nil, onDatabase:migratedDb)
+        }.to(throwError(errorType: UpdatesDatabaseUtilsError.self) { error in
           expect(error.info?.extendedCode) == 787
         })
 
         // try to insert an entry in updates_assets that references a nonexistent update
         let foreignKeyInsertBadSql2 = "INSERT INTO `updates_assets` (`update_id`, `asset_id`) VALUES (X'3CF0A835CB3A4A5D9C14DFA3D55DE44D', 3)"
         expect {
-          try EXUpdatesDatabaseUtils.execute(sql:foreignKeyInsertBadSql2, withArgs:nil, onDatabase:migratedDb)
-        }.to(throwError(errorType: EXUpdatesDatabaseUtilsError.self) { error in
+          try UpdatesDatabaseUtils.execute(sql:foreignKeyInsertBadSql2, withArgs:nil, onDatabase:migratedDb)
+        }.to(throwError(errorType: UpdatesDatabaseUtilsError.self) { error in
           expect(error.info?.extendedCode) == 787
         })
 
         // test updates on delete cascade
         let deleteSql = "DELETE FROM `assets` WHERE `id` = 3"
         let selectDeletedSql1 = "SELECT * FROM `updates` WHERE `id` = X'8C263F9DE3FF48888496E3244C788661'"
-        _ = try! EXUpdatesDatabaseUtils.execute(sql:deleteSql, withArgs:nil, onDatabase:migratedDb)
-        expect(try! EXUpdatesDatabaseUtils.execute(sql:selectDeletedSql1, withArgs:nil, onDatabase:migratedDb).count) == 0
+        _ = try! UpdatesDatabaseUtils.execute(sql:deleteSql, withArgs:nil, onDatabase:migratedDb)
+        expect(try! UpdatesDatabaseUtils.execute(sql:selectDeletedSql1, withArgs:nil, onDatabase:migratedDb).count) == 0
 
         // test updates_assets on delete cascade
         // previous deletion should have deleted the update, which then should have deleted both entries in updates_assets
         let selectDeletedSql2 = "SELECT * FROM `updates_assets` WHERE `update_id` = X'8C263F9DE3FF48888496E3244C788661' AND `asset_id` = 2"
-        expect(try! EXUpdatesDatabaseUtils.execute(sql:selectDeletedSql2, withArgs:nil, onDatabase:migratedDb).count) == 0
+        expect(try! UpdatesDatabaseUtils.execute(sql:selectDeletedSql2, withArgs:nil, onDatabase:migratedDb).count) == 0
         let selectDeletedSql3 = "SELECT * FROM `updates_assets` WHERE `update_id` = X'8C263F9DE3FF48888496E3244C788661' AND `asset_id` = 3"
-        expect(try! EXUpdatesDatabaseUtils.execute(sql:selectDeletedSql3, withArgs:nil, onDatabase:migratedDb).count) == 0
+        expect(try! UpdatesDatabaseUtils.execute(sql:selectDeletedSql3, withArgs:nil, onDatabase:migratedDb).count) == 0
       }
 
       it("migrates 6 to 7") {
-        let db = try! EXUpdatesDatabaseInitialization.initializeDatabase(
+        let db = try! UpdatesDatabaseInitialization.initializeDatabase(
           withSchema: EXUpdatesDatabaseV6Schema,
           filename: "expo-v6.db",
           inDirectory: testDatabaseDir,
@@ -559,51 +559,51 @@ class EXUpdatesDatabaseInitializationSpec : ExpoSpec {
             (X'8C263F9DE3FF48888496E3244C788661',3),
             (X'594100ea066e4804b5c7c907c773f980',4);
         """
-        _ = try! EXUpdatesDatabaseUtils.execute(sql:insertAssetsSql, withArgs:nil, onDatabase:db)
-        _ = try! EXUpdatesDatabaseUtils.execute(sql:insertUpdatesSql, withArgs:nil, onDatabase:db)
-        _ = try! EXUpdatesDatabaseUtils.execute(sql:insertUpdatesAssetsSql, withArgs:nil, onDatabase:db)
+        _ = try! UpdatesDatabaseUtils.execute(sql:insertAssetsSql, withArgs:nil, onDatabase:db)
+        _ = try! UpdatesDatabaseUtils.execute(sql:insertUpdatesSql, withArgs:nil, onDatabase:db)
+        _ = try! UpdatesDatabaseUtils.execute(sql:insertUpdatesAssetsSql, withArgs:nil, onDatabase:db)
 
         sqlite3_close(db)
 
         // initialize a new database object the normal way and run migrations
-        let migratedDb = try! EXUpdatesDatabaseInitialization.initializeDatabaseWithLatestSchema(
+        let migratedDb = try! UpdatesDatabaseInitialization.initializeDatabaseWithLatestSchema(
           inDirectory: testDatabaseDir,
           migrations: [EXUpdatesDatabaseMigration6To7()]
         )
 
         // verify data integrity
         let updatesSql1 = "SELECT * FROM `updates` WHERE `id` = X'8C263F9DE3FF48888496E3244C788661' AND `scope_key` = 'http://192.168.4.44:3000' AND `commit_time` = 1614137308871 AND `runtime_version` = '40.0.0' AND `launch_asset_id` = 3 AND `manifest` IS NOT NULL AND `status` = 1 AND `keep` = 1 AND `last_accessed` = 1619647642456 AND `successful_launch_count` = 1 AND `failed_launch_count` = 0"
-        expect(try! EXUpdatesDatabaseUtils.execute(sql:updatesSql1, withArgs:nil, onDatabase:migratedDb).count) == 1
+        expect(try! UpdatesDatabaseUtils.execute(sql:updatesSql1, withArgs:nil, onDatabase:migratedDb).count) == 1
         let updatesSql2 = "SELECT * FROM `updates` WHERE `id` = X'594100ea066e4804b5c7c907c773f980' AND `scope_key` = 'http://192.168.4.44:3000' AND `commit_time` = 1614137401950 AND `runtime_version` = '40.0.0' AND `launch_asset_id` = 4 AND `manifest` IS NULL AND `status` = 1 AND `keep` = 1 AND `last_accessed` = 1619647642457 AND `successful_launch_count` = 1 AND `failed_launch_count` = 0"
-        expect(try! EXUpdatesDatabaseUtils.execute(sql:updatesSql2, withArgs:nil, onDatabase:migratedDb).count) == 1
+        expect(try! UpdatesDatabaseUtils.execute(sql:updatesSql2, withArgs:nil, onDatabase:migratedDb).count) == 1
 
         let assetsSql1 = "SELECT * FROM `assets` WHERE `id` = 2 AND `url` = 'https://url.to/b56cf690e0afa93bd4dc7756d01edd3e' AND `key` = 'b56cf690e0afa93bd4dc7756d01edd3e.png' AND `headers` IS NULL AND `type` = 'image/png' AND `metadata` IS NULL AND `download_time` = 1614137309295 AND `relative_path` = 'b56cf690e0afa93bd4dc7756d01edd3e.png' AND `hash` = 'c4fdfc2ec388025067a0f755bda7731a0a868a2be79c84509f4de4e40d23161b' AND `hash_type` = 0 AND `marked_for_deletion` = 0"
-        expect(try! EXUpdatesDatabaseUtils.execute(sql:assetsSql1, withArgs:nil, onDatabase:migratedDb).count) == 1
+        expect(try! UpdatesDatabaseUtils.execute(sql:assetsSql1, withArgs:nil, onDatabase:migratedDb).count) == 1
         let assetsSql2 = "SELECT * FROM `assets` WHERE `id` = 3 AND `url` = 'https://url.to/bundle-1614137308871' AND `key` = 'bundle-1614137308871' AND `headers` IS NULL AND `type` = 'application/javascript' AND `metadata` IS NULL AND `download_time` = 1614137309513 AND `relative_path` = 'bundle-1614137308871' AND `hash` = 'e4d658861e85e301fb89bcfc49c42738ebcc0f9d5c979e037556435f44a27aa2' AND `hash_type` = 0 AND `marked_for_deletion` = 0"
-        expect(try! EXUpdatesDatabaseUtils.execute(sql:assetsSql2, withArgs:nil, onDatabase:migratedDb).count) == 1
+        expect(try! UpdatesDatabaseUtils.execute(sql:assetsSql2, withArgs:nil, onDatabase:migratedDb).count) == 1
         let assetsSql3 = "SELECT * FROM `assets` WHERE `id` = 4 AND `url` IS NULL AND `key` IS NULL AND `headers` IS NULL AND `type` = 'js' AND `metadata` IS NULL AND `download_time` = 1614137406588 AND `relative_path` = 'bundle-1614137401950' AND `hash` = '6ff4ee75b48a21c7a9ed98015ff6bfd0a47b94cd087c5e2258262e65af239952' AND `hash_type` = 0 AND `marked_for_deletion` = 0"
-        expect(try! EXUpdatesDatabaseUtils.execute(sql:assetsSql3, withArgs:nil, onDatabase:migratedDb).count) == 1
+        expect(try! UpdatesDatabaseUtils.execute(sql:assetsSql3, withArgs:nil, onDatabase:migratedDb).count) == 1
 
         let updatesAssetsSql1 = "SELECT * FROM `updates_assets` WHERE `update_id` = X'8C263F9DE3FF48888496E3244C788661' AND `asset_id` = 2"
-        expect(try! EXUpdatesDatabaseUtils.execute(sql:updatesAssetsSql1, withArgs:nil, onDatabase:migratedDb).count) == 1
+        expect(try! UpdatesDatabaseUtils.execute(sql:updatesAssetsSql1, withArgs:nil, onDatabase:migratedDb).count) == 1
         let updatesAssetsSql2 = "SELECT * FROM `updates_assets` WHERE `update_id` = X'8C263F9DE3FF48888496E3244C788661' AND `asset_id` = 3"
-        expect(try! EXUpdatesDatabaseUtils.execute(sql:updatesAssetsSql2, withArgs:nil, onDatabase:migratedDb).count) == 1
+        expect(try! UpdatesDatabaseUtils.execute(sql:updatesAssetsSql2, withArgs:nil, onDatabase:migratedDb).count) == 1
         let updatesAssetsSql3 = "SELECT * FROM `updates_assets` WHERE `update_id` = X'594100ea066e4804b5c7c907c773f980' AND `asset_id` = 4"
-        expect(try! EXUpdatesDatabaseUtils.execute(sql:updatesAssetsSql3, withArgs:nil, onDatabase:migratedDb).count) == 1
+        expect(try! UpdatesDatabaseUtils.execute(sql:updatesAssetsSql3, withArgs:nil, onDatabase:migratedDb).count) == 1
 
         // make sure successful_launch_count and failed_launch_count columns were filled in properly
         let successfulLaunchCountSql = "SELECT DISTINCT `successful_launch_count` FROM `updates`"
-        expect(try! EXUpdatesDatabaseUtils.execute(sql:successfulLaunchCountSql, withArgs:nil, onDatabase:migratedDb).count) == 1
+        expect(try! UpdatesDatabaseUtils.execute(sql:successfulLaunchCountSql, withArgs:nil, onDatabase:migratedDb).count) == 1
         let failedLaunchCount = "SELECT DISTINCT `failed_launch_count` FROM `updates`"
-        expect(try! EXUpdatesDatabaseUtils.execute(sql:failedLaunchCount, withArgs:nil, onDatabase:migratedDb).count) == 1
+        expect(try! UpdatesDatabaseUtils.execute(sql:failedLaunchCount, withArgs:nil, onDatabase:migratedDb).count) == 1
 
         // make sure we can modify successful and failed launch counts
         let modifySuccessfulLaunchCountSql = "UPDATE `updates` SET `successful_launch_count` = 2 WHERE `id` = X'8C263F9DE3FF48888496E3244C788661';"
         let modifyFailedLaunchCountSql = "UPDATE `updates` SET `failed_launch_count` = 1 WHERE `id` = X'594100ea066e4804b5c7c907c773f980';"
-        _ = try! EXUpdatesDatabaseUtils.execute(sql:modifySuccessfulLaunchCountSql, withArgs:nil, onDatabase:migratedDb)
-        _ = try! EXUpdatesDatabaseUtils.execute(sql:modifyFailedLaunchCountSql, withArgs:nil, onDatabase:migratedDb)
+        _ = try! UpdatesDatabaseUtils.execute(sql:modifySuccessfulLaunchCountSql, withArgs:nil, onDatabase:migratedDb)
+        _ = try! UpdatesDatabaseUtils.execute(sql:modifyFailedLaunchCountSql, withArgs:nil, onDatabase:migratedDb)
         let checkFailedLaunchCountSql = "SELECT `id` FROM `updates` WHERE `failed_launch_count` > 0"
-        expect(try! EXUpdatesDatabaseUtils.execute(sql:checkFailedLaunchCountSql, withArgs:nil, onDatabase:migratedDb).count) == 1
+        expect(try! UpdatesDatabaseUtils.execute(sql:checkFailedLaunchCountSql, withArgs:nil, onDatabase:migratedDb).count) == 1
 
         // make sure foreign key constraints still work
 
@@ -612,35 +612,35 @@ class EXUpdatesDatabaseInitializationSpec : ExpoSpec {
           INSERT INTO "updates" ("id","scope_key","commit_time","runtime_version","launch_asset_id","manifest","status","keep", "last_accessed","successful_launch_count","failed_launch_count") VALUES  (X'E1AC9D5F55E041BBA5A9193DD1C1123A','https://exp.host/@esamelson/sdk41updates',1620168547318,'41.0.0',47,NULL,1,1,1619647642456,0,0)
         """
         expect {
-          try EXUpdatesDatabaseUtils.execute(sql:foreignKeyInsertBadSql1, withArgs:nil, onDatabase:migratedDb)
-        }.to(throwError(errorType: EXUpdatesDatabaseUtilsError.self) { error in
+          try UpdatesDatabaseUtils.execute(sql:foreignKeyInsertBadSql1, withArgs:nil, onDatabase:migratedDb)
+        }.to(throwError(errorType: UpdatesDatabaseUtilsError.self) { error in
           expect(error.info?.extendedCode) == 787
         })
 
         // try to insert an entry in updates_assets that references a nonexistent update
         let foreignKeyInsertBadSql2 = "INSERT INTO `updates_assets` (`update_id`, `asset_id`) VALUES (X'3CF0A835CB3A4A5D9C14DFA3D55DE44D', 3)"
         expect {
-          try EXUpdatesDatabaseUtils.execute(sql:foreignKeyInsertBadSql2, withArgs:nil, onDatabase:migratedDb)
-        }.to(throwError(errorType: EXUpdatesDatabaseUtilsError.self) { error in
+          try UpdatesDatabaseUtils.execute(sql:foreignKeyInsertBadSql2, withArgs:nil, onDatabase:migratedDb)
+        }.to(throwError(errorType: UpdatesDatabaseUtilsError.self) { error in
           expect(error.info?.extendedCode) == 787
         })
 
         // test updates on delete cascade
         let deleteSql = "DELETE FROM `assets` WHERE `id` = 3"
-        _ = try! EXUpdatesDatabaseUtils.execute(sql:deleteSql, withArgs:nil, onDatabase:migratedDb)
+        _ = try! UpdatesDatabaseUtils.execute(sql:deleteSql, withArgs:nil, onDatabase:migratedDb)
         let selectDeletedSql1 = "SELECT * FROM `updates` WHERE `id` = X'8C263F9DE3FF48888496E3244C788661'"
-        expect(try! EXUpdatesDatabaseUtils.execute(sql:selectDeletedSql1, withArgs:nil, onDatabase:migratedDb).count) == 0
+        expect(try! UpdatesDatabaseUtils.execute(sql:selectDeletedSql1, withArgs:nil, onDatabase:migratedDb).count) == 0
 
         // test updates_assets on delete cascade
         // previous deletion should have deleted the update, which then should have deleted both entries in updates_assets
         let selectDeletedSql2 = "SELECT * FROM `updates_assets` WHERE `update_id` = X'8C263F9DE3FF48888496E3244C788661' AND `asset_id` = 2"
-        expect(try! EXUpdatesDatabaseUtils.execute(sql:selectDeletedSql2, withArgs:nil, onDatabase:migratedDb).count) == 0
+        expect(try! UpdatesDatabaseUtils.execute(sql:selectDeletedSql2, withArgs:nil, onDatabase:migratedDb).count) == 0
         let selectDeletedSql3 = "SELECT * FROM `updates_assets` WHERE `update_id` = X'8C263F9DE3FF48888496E3244C788661' AND `asset_id` = 3"
-        expect(try! EXUpdatesDatabaseUtils.execute(sql:selectDeletedSql3, withArgs:nil, onDatabase:migratedDb).count) == 0
+        expect(try! UpdatesDatabaseUtils.execute(sql:selectDeletedSql3, withArgs:nil, onDatabase:migratedDb).count) == 0
       }
 
       it("migrates 7 to 8") {
-        let db = try! EXUpdatesDatabaseInitialization.initializeDatabase(
+        let db = try! UpdatesDatabaseInitialization.initializeDatabase(
           withSchema: EXUpdatesDatabaseV7Schema,
           filename: "expo-v7.db",
           inDirectory: testDatabaseDir,
@@ -656,27 +656,27 @@ class EXUpdatesDatabaseInitializationSpec : ExpoSpec {
             (4,NULL,NULL,NULL,'js',NULL,1614137406588,'bundle-1614137401950','6ff4ee75b48a21c7a9ed98015ff6bfd0a47b94cd087c5e2258262e65af239952',0,0);
         """
 
-        _ = try! EXUpdatesDatabaseUtils.execute(sql:insertAssetsSql, withArgs:nil, onDatabase:db)
+        _ = try! UpdatesDatabaseUtils.execute(sql:insertAssetsSql, withArgs:nil, onDatabase:db)
 
 
         sqlite3_close(db)
 
         // initialize a new database object the normal way and run migrations
-        let migratedDb = try! EXUpdatesDatabaseInitialization.initializeDatabaseWithLatestSchema(
+        let migratedDb = try! UpdatesDatabaseInitialization.initializeDatabaseWithLatestSchema(
           inDirectory: testDatabaseDir,
           migrations: [EXUpdatesDatabaseMigration7To8()]
         )
 
         let assetsSql1 = "SELECT * FROM `assets` WHERE `id` = 2 AND `url` = 'https://url.to/b56cf690e0afa93bd4dc7756d01edd3e' AND `key` = 'b56cf690e0afa93bd4dc7756d01edd3e.png' AND `headers` IS NULL AND `type` = 'image/png' AND `metadata` IS NULL AND `download_time` = 1614137309295 AND `relative_path` = 'b56cf690e0afa93bd4dc7756d01edd3e.png' AND `hash` = 'c4fdfc2ec388025067a0f755bda7731a0a868a2be79c84509f4de4e40d23161b' AND `hash_type` = 0 AND `marked_for_deletion` = 0 AND `extra_request_headers` IS NULL"
-        expect(try! EXUpdatesDatabaseUtils.execute(sql:assetsSql1, withArgs:nil, onDatabase:migratedDb).count) == 1
+        expect(try! UpdatesDatabaseUtils.execute(sql:assetsSql1, withArgs:nil, onDatabase:migratedDb).count) == 1
         let assetsSql2 = "SELECT * FROM `assets` WHERE `id` = 3 AND `url` = 'https://url.to/bundle-1614137308871' AND `key` = 'bundle-1614137308871' AND `headers` IS NULL AND `type` = 'application/javascript' AND `metadata` IS NULL AND `download_time` = 1614137309513 AND `relative_path` = 'bundle-1614137308871' AND `hash` = 'e4d658861e85e301fb89bcfc49c42738ebcc0f9d5c979e037556435f44a27aa2' AND `hash_type` = 0 AND `marked_for_deletion` = 0 AND `extra_request_headers` IS NULL"
-        expect(try! EXUpdatesDatabaseUtils.execute(sql:assetsSql2, withArgs:nil, onDatabase:migratedDb).count) == 1
+        expect(try! UpdatesDatabaseUtils.execute(sql:assetsSql2, withArgs:nil, onDatabase:migratedDb).count) == 1
         let assetsSql3 = "SELECT * FROM `assets` WHERE `id` = 4 AND `url` IS NULL AND `key` IS NULL AND `headers` IS NULL AND `type` = 'js' AND `metadata` IS NULL AND `download_time` = 1614137406588 AND `relative_path` = 'bundle-1614137401950' AND `hash` = '6ff4ee75b48a21c7a9ed98015ff6bfd0a47b94cd087c5e2258262e65af239952' AND `hash_type` = 0 AND `marked_for_deletion` = 0 AND `extra_request_headers` IS NULL"
-        expect(try! EXUpdatesDatabaseUtils.execute(sql:assetsSql3, withArgs:nil, onDatabase:migratedDb).count) == 1
+        expect(try! UpdatesDatabaseUtils.execute(sql:assetsSql3, withArgs:nil, onDatabase:migratedDb).count) == 1
       }
 
       it("migrates 8 to 9") {
-        let db = try! EXUpdatesDatabaseInitialization.initializeDatabase(
+        let db = try! UpdatesDatabaseInitialization.initializeDatabase(
           withSchema: EXUpdatesDatabaseV8Schema,
           filename: "expo-v8.db",
           inDirectory: testDatabaseDir,
@@ -692,23 +692,23 @@ class EXUpdatesDatabaseInitializationSpec : ExpoSpec {
             (4,NULL,NULL,NULL,'js',NULL,1614137406588,'bundle-1614137401950','6ff4ee75b48a21c7a9ed98015ff6bfd0a47b94cd087c5e2258262e65af239952',0,0,NULL);
         """
 
-        _ = try! EXUpdatesDatabaseUtils.execute(sql:insertAssetsSql, withArgs:nil, onDatabase:db)
+        _ = try! UpdatesDatabaseUtils.execute(sql:insertAssetsSql, withArgs:nil, onDatabase:db)
 
 
         sqlite3_close(db)
 
         // initialize a new database object the normal way and run migrations
-        let migratedDb = try! EXUpdatesDatabaseInitialization.initializeDatabaseWithLatestSchema(
+        let migratedDb = try! UpdatesDatabaseInitialization.initializeDatabaseWithLatestSchema(
           inDirectory: testDatabaseDir,
           migrations: [EXUpdatesDatabaseMigration8To9()]
         )
 
         let assetsSql1 = "SELECT * FROM `assets` WHERE `id` = 2 AND `url` = 'https://url.to/b56cf690e0afa93bd4dc7756d01edd3e' AND `key` = 'b56cf690e0afa93bd4dc7756d01edd3e.png' AND `headers` IS NULL AND `type` = 'image/png' AND `metadata` IS NULL AND `download_time` = 1614137309295 AND `relative_path` = 'b56cf690e0afa93bd4dc7756d01edd3e.png' AND `hash` = 'c4fdfc2ec388025067a0f755bda7731a0a868a2be79c84509f4de4e40d23161b' AND `hash_type` = 0 AND `marked_for_deletion` = 0 AND `extra_request_headers` IS NULL AND `expected_hash` IS NULL"
-        expect(try! EXUpdatesDatabaseUtils.execute(sql:assetsSql1, withArgs:nil, onDatabase:migratedDb).count) == 1
+        expect(try! UpdatesDatabaseUtils.execute(sql:assetsSql1, withArgs:nil, onDatabase:migratedDb).count) == 1
         let assetsSql2 = "SELECT * FROM `assets` WHERE `id` = 3 AND `url` = 'https://url.to/bundle-1614137308871' AND `key` = 'bundle-1614137308871' AND `headers` IS NULL AND `type` = 'application/javascript' AND `metadata` IS NULL AND `download_time` = 1614137309513 AND `relative_path` = 'bundle-1614137308871' AND `hash` = 'e4d658861e85e301fb89bcfc49c42738ebcc0f9d5c979e037556435f44a27aa2' AND `hash_type` = 0 AND `marked_for_deletion` = 0 AND `extra_request_headers` IS NULL AND `expected_hash` IS NULL"
-        expect(try! EXUpdatesDatabaseUtils.execute(sql:assetsSql2, withArgs:nil, onDatabase:migratedDb).count) == 1
+        expect(try! UpdatesDatabaseUtils.execute(sql:assetsSql2, withArgs:nil, onDatabase:migratedDb).count) == 1
         let assetsSql3 = "SELECT * FROM `assets` WHERE `id` = 4 AND `url` IS NULL AND `key` IS NULL AND `headers` IS NULL AND `type` = 'js' AND `metadata` IS NULL AND `download_time` = 1614137406588 AND `relative_path` = 'bundle-1614137401950' AND `hash` = '6ff4ee75b48a21c7a9ed98015ff6bfd0a47b94cd087c5e2258262e65af239952' AND `hash_type` = 0 AND `marked_for_deletion` = 0 AND `extra_request_headers` IS NULL AND `expected_hash` IS NULL"
-        expect(try! EXUpdatesDatabaseUtils.execute(sql:assetsSql3, withArgs:nil, onDatabase:migratedDb).count) == 1
+        expect(try! UpdatesDatabaseUtils.execute(sql:assetsSql3, withArgs:nil, onDatabase:migratedDb).count) == 1
       }
     }
   }

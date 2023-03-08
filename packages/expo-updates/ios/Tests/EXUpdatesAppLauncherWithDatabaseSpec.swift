@@ -11,7 +11,7 @@ class EXUpdatesAppLauncherWithDatabaseMock : EXUpdatesAppLauncherWithDatabase {
     return EXUpdatesUpdate(
       manifest: EXManifestsManifestFactory.manifest(forManifestJSON: [:]),
       config: EXUpdatesConfig.config(fromDictionary: [:]),
-      database: EXUpdatesDatabase(),
+      database: UpdatesDatabase(),
       updateId: UUID(),
       scopeKey: "dummyScope",
       commitTime: Date(timeIntervalSince1970: 1608667851),
@@ -37,7 +37,7 @@ class EXUpdatesAppLauncherWithDatabaseMock : EXUpdatesAppLauncherWithDatabase {
 class EXUpdatesAppLauncherWithDatabaseSpec : ExpoSpec {
   override func spec() {
     var testDatabaseDir: URL!
-    var db: EXUpdatesDatabase!
+    var db: UpdatesDatabase!
     
     beforeEach {
       let applicationSupportDir = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).last
@@ -49,7 +49,7 @@ class EXUpdatesAppLauncherWithDatabaseSpec : ExpoSpec {
         try! FileManager.default.createDirectory(atPath: testDatabaseDir.path, withIntermediateDirectories: true)
       }
       
-      db = EXUpdatesDatabase()
+      db = UpdatesDatabase()
       db.databaseQueue.sync {
         try! db.openDatabase(inDirectory: testDatabaseDir)
       }

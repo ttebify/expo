@@ -3,7 +3,7 @@
 import Foundation
 
 /**
- * An EXUpdatesReaperSelectionPolicy which chooses which updates to delete taking into account manifest filters
+ * An UpdatesReaperSelectionPolicy which chooses which updates to delete taking into account manifest filters
  * originating from the server. If an older update is available, it will choose to keep one older
  * update in addition to the one currently running, preferring updates that match the same filters
  * if available.
@@ -13,7 +13,7 @@ import Foundation
  * Chooses only to delete updates who scope matches that of `launchedUpdate`.
  */
 @objcMembers
-public final class EXUpdatesReaperSelectionPolicyFilterAware: NSObject, EXUpdatesReaperSelectionPolicy {
+public final class UpdatesReaperSelectionPolicyFilterAware: NSObject, UpdatesReaperSelectionPolicy {
   public func updatesToDelete(withLaunchedUpdate launchedUpdate: EXUpdatesUpdate, updates: [EXUpdatesUpdate], filters: [String: Any]?) -> [EXUpdatesUpdate] {
     var updatesToDelete: [EXUpdatesUpdate] = []
 

@@ -63,7 +63,7 @@ public final class EXUpdatesAppLoaderTask: NSObject {
   public weak var delegate: EXUpdatesAppLoaderTaskDelegate?
 
   private let config: EXUpdatesConfig
-  private let database: EXUpdatesDatabase
+  private let database: UpdatesDatabase
   private let directory: URL
   private let selectionPolicy: EXUpdatesSelectionPolicy
   private let delegateQueue: DispatchQueue
@@ -84,7 +84,7 @@ public final class EXUpdatesAppLoaderTask: NSObject {
 
   public required init(
     withConfig config: EXUpdatesConfig,
-    database: EXUpdatesDatabase,
+    database: UpdatesDatabase,
     directory: URL,
     selectionPolicy: EXUpdatesSelectionPolicy,
     delegateQueue: DispatchQueue
@@ -244,7 +244,7 @@ public final class EXUpdatesAppLoaderTask: NSObject {
 
   private func runReaper() {
     if let launchedUpdate = finalizedLauncher?.launchedUpdate {
-      EXUpdatesReaper.reapUnusedUpdates(
+      UpdatesReaper.reapUnusedUpdates(
         withConfig: config,
         database: database,
         directory: directory,

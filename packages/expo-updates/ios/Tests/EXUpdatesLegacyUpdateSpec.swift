@@ -14,7 +14,7 @@ class EXUpdatesLegacyUpdateSpec : ExpoSpec {
     EXUpdatesConfig.EXUpdatesConfigUpdateUrlKey: "https://esamelson.github.io/self-hosting-test/ios-index.json",
     EXUpdatesConfig.EXUpdatesConfigSDKVersionKey: "38.0.0"
   ])
-  let database = EXUpdatesDatabase()
+  let database = UpdatesDatabase()
 
   override func spec() {
     describe("bundledAssetBaseUrl") {

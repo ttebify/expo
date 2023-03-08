@@ -7,6 +7,6 @@ import Foundation
  * automatically delete from disk and which ones to keep.
  */
 @objc
-public protocol EXUpdatesReaperSelectionPolicy {
+public protocol UpdatesReaperSelectionPolicy {
   @objc func updatesToDelete(withLaunchedUpdate launchedUpdate: EXUpdatesUpdate, updates: [EXUpdatesUpdate], filters: [String: Any]?) -> [EXUpdatesUpdate]
 }

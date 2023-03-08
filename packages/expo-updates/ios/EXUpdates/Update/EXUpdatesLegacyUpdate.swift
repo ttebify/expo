@@ -15,7 +15,7 @@ internal final class EXUpdatesLegacyUpdate: EXUpdatesUpdate {
   public static func update(
     withLegacyManifest: EXManifestsLegacyManifest,
     config: EXUpdatesConfig,
-    database: EXUpdatesDatabase?
+    database: UpdatesDatabase?
   ) -> EXUpdatesUpdate {
     let manifest = withLegacyManifest
 

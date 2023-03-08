@@ -9,7 +9,7 @@ import EXManifests
 class EXUpdatesFileDownloaderSpec : ExpoSpec {
   override func spec() {
     var testDatabaseDir: URL!
-    var db: EXUpdatesDatabase!
+    var db: UpdatesDatabase!
     
     beforeEach {
       let applicationSupportDir = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).last
@@ -21,7 +21,7 @@ class EXUpdatesFileDownloaderSpec : ExpoSpec {
         try! FileManager.default.createDirectory(atPath: testDatabaseDir.path, withIntermediateDirectories: true)
       }
       
-      db = EXUpdatesDatabase()
+      db = UpdatesDatabase()
       db.databaseQueue.sync {
         try! db.openDatabase(inDirectory: testDatabaseDir)
       }

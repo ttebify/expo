@@ -232,7 +232,7 @@ class EXUpdatesErrorRecoverySpec : ExpoSpec {
         // if an update has already been launched successfully, we don't want to fall back to an older update
         
         let config = EXUpdatesConfig.config(fromDictionary: [:])
-        let database = EXUpdatesDatabase()
+        let database = UpdatesDatabase()
         let mockDelegate = MockErrorRecoveryDelegate(
           config: config,
           relaunchCompletionParams: (nil, true)
@@ -301,7 +301,7 @@ class EXUpdatesErrorRecoverySpec : ExpoSpec {
         let (testQueue, errorRecovery) = setUp()
         // if an update has already been launched successfully, we don't want to fall back to an older update
         let config = EXUpdatesConfig.config(fromDictionary: [:])
-        let database = EXUpdatesDatabase()
+        let database = UpdatesDatabase()
         let mockDelegate = MockErrorRecoveryDelegate(
           config: config,
           relaunchCompletionParams: (nil, true)

@@ -168,7 +168,7 @@ internal final class EXUpdatesFileDownloader: NSObject, URLSessionDataDelegate {
 
   public func downloadManifest(
     fromURL url: URL,
-    withDatabase database: EXUpdatesDatabase,
+    withDatabase database: UpdatesDatabase,
     extraHeaders: [String: Any]?,
     successBlock: @escaping ManifestSuccessBlock,
     errorBlock: @escaping ErrorBlock
@@ -198,7 +198,7 @@ internal final class EXUpdatesFileDownloader: NSObject, URLSessionDataDelegate {
    * Must be called on the database queue
    */
   public static func extraHeaders(
-    withDatabase database: EXUpdatesDatabase,
+    withDatabase database: UpdatesDatabase,
     config: EXUpdatesConfig,
     launchedUpdate: EXUpdatesUpdate?,
     embeddedUpdate: EXUpdatesUpdate?
@@ -317,7 +317,7 @@ internal final class EXUpdatesFileDownloader: NSObject, URLSessionDataDelegate {
   public func parseManifestResponse(
     _ httpResponse: HTTPURLResponse,
     withData data: Data,
-    database: EXUpdatesDatabase,
+    database: UpdatesDatabase,
     successBlock: @escaping ManifestSuccessBlock,
     errorBlock: @escaping ErrorBlock
   ) {
@@ -375,7 +375,7 @@ internal final class EXUpdatesFileDownloader: NSObject, URLSessionDataDelegate {
   private func parseMultipartManifestResponse(
     _ httpResponse: HTTPURLResponse,
     withData data: Data,
-    database: EXUpdatesDatabase,
+    database: UpdatesDatabase,
     boundary: String,
     successBlock: @escaping ManifestSuccessBlock,
     errorBlock: @escaping ErrorBlock
@@ -485,7 +485,7 @@ internal final class EXUpdatesFileDownloader: NSObject, URLSessionDataDelegate {
     manifestHeaders: EXUpdatesManifestHeaders,
     extensions: [String: Any],
     certificateChainFromManifestResponse: String?,
-    database: EXUpdatesDatabase,
+    database: UpdatesDatabase,
     successBlock: @escaping ManifestSuccessBlock,
     errorBlock: @escaping ErrorBlock
   ) {
@@ -642,7 +642,7 @@ internal final class EXUpdatesFileDownloader: NSObject, URLSessionDataDelegate {
     manifestHeaders: EXUpdatesManifestHeaders,
     extensions: [String: Any],
     certificateChainFromManifestResponse: String?,
-    database: EXUpdatesDatabase,
+    database: UpdatesDatabase,
     isVerified: Bool,
     successBlock: ManifestSuccessBlock,
     errorBlock: ErrorBlock

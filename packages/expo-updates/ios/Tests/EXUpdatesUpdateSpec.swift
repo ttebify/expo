@@ -10,7 +10,7 @@ class EXUpdatesUpdateSpec : ExpoSpec {
   let config = EXUpdatesConfig.config(fromDictionary: [
     EXUpdatesConfig.EXUpdatesConfigUpdateUrlKey: "https://exp.host/@test/test"
   ])
-  let database = EXUpdatesDatabase()
+  let database = UpdatesDatabase()
   
   override func spec() {
     describe("instantiation") {

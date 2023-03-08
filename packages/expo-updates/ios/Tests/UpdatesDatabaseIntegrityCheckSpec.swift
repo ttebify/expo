@@ -6,16 +6,16 @@ import ExpoModulesTestCore
 
 import EXManifests
 
-class EXUpdatesDatabaseIntegrityCheckMockingAssetExists : EXUpdatesDatabaseIntegrityCheck {
+class UpdatesDatabaseIntegrityCheckMockingAssetExists : UpdatesDatabaseIntegrityCheck {
   public override func assetExists(_ asset: EXUpdatesAsset, inDirectory directory: URL) -> Bool {
     return asset.key == "asset1"
   }
 }
 
-class EXUpdatesDatabaseIntegrityCheckSpec : ExpoSpec {
+class UpdatesDatabaseIntegrityCheckSpec : ExpoSpec {
   override func spec() {
     var testDatabaseDir: URL!
-    var db: EXUpdatesDatabase!
+    var db: UpdatesDatabase!
     
     beforeEach {
       let applicationSupportDir = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).last
@@ -27,7 +27,7 @@ class EXUpdatesDatabaseIntegrityCheckSpec : ExpoSpec {
         try! FileManager.default.createDirectory(atPath: testDatabaseDir.path, withIntermediateDirectories: true)
       }
       
-      db = EXUpdatesDatabase()
+      db = UpdatesDatabase()
       db.databaseQueue.sync {
         try! db.openDatabase(inDirectory: testDatabaseDir)
       }
@@ -87,7 +87,7 @@ class EXUpdatesDatabaseIntegrityCheckSpec : ExpoSpec {
           
           expect(try! db.allUpdates(withConfig: config).count) == 2
           
-          try! EXUpdatesDatabaseIntegrityCheck().run(withDatabase: db, directory: testDatabaseDir, config: config, embeddedUpdate: update2)
+          try! UpdatesDatabaseIntegrityCheck().run(withDatabase: db, directory: testDatabaseDir, config: config, embeddedUpdate: update2)
           
           let allUpdates = try! db.allUpdates(withConfig: config)
           expect(allUpdates.count) == 1
@@ -148,7 +148,7 @@ class EXUpdatesDatabaseIntegrityCheckSpec : ExpoSpec {
           expect(try! db.allUpdates(withConfig: config).count) == 2
           expect(try! db.allAssets().count) == 2
           
-          try! EXUpdatesDatabaseIntegrityCheckMockingAssetExists().run(
+          try! UpdatesDatabaseIntegrityCheckMockingAssetExists().run(
             withDatabase: db,
             directory: testDatabaseDir,
             config: config,

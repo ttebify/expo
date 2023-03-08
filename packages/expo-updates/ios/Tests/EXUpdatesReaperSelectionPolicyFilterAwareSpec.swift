@@ -6,16 +6,16 @@ import ExpoModulesTestCore
 
 import EXManifests
 
-class EXUpdatesReaperSelectionPolicyFilterAwareSpec : ExpoSpec {
+class UpdatesReaperSelectionPolicyFilterAwareSpec : ExpoSpec {
   override func spec() {
     var config: EXUpdatesConfig!
-    var database: EXUpdatesDatabase!
+    var database: UpdatesDatabase!
     var update1: EXUpdatesUpdate!
     var update2: EXUpdatesUpdate!
     var update3: EXUpdatesUpdate!
     var update4: EXUpdatesUpdate!
     var update5: EXUpdatesUpdate!
-    var selectionPolicy: EXUpdatesReaperSelectionPolicy!
+    var selectionPolicy: UpdatesReaperSelectionPolicy!
     
     beforeEach {
       let runtimeVersion = "1.0"
@@ -23,7 +23,7 @@ class EXUpdatesReaperSelectionPolicyFilterAwareSpec : ExpoSpec {
       config = EXUpdatesConfig.config(fromDictionary: [
         EXUpdatesConfig.EXUpdatesConfigScopeKeyKey: "scope1"
       ])
-      database = EXUpdatesDatabase()
+      database = UpdatesDatabase()
       update1 = EXUpdatesUpdate(
         manifest: EXManifestsManifestFactory.manifest(forManifestJSON: [:]),
         config: config,
@@ -90,7 +90,7 @@ class EXUpdatesReaperSelectionPolicyFilterAwareSpec : ExpoSpec {
         assetsFromManifest: []
       )
       
-      selectionPolicy = EXUpdatesReaperSelectionPolicyFilterAware()
+      selectionPolicy = UpdatesReaperSelectionPolicyFilterAware()
     }
     
     describe("selection") {

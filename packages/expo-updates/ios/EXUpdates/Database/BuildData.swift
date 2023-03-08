@@ -25,8 +25,8 @@ import Foundation
  *
  *   EXUpdatesRequestHeaders
  */
-internal final class EXUpdatesBuildData {
-  public static func ensureBuildDataIsConsistentAsync(database: EXUpdatesDatabase, config: EXUpdatesConfig) {
+internal final class BuildData {
+  public static func ensureBuildDataIsConsistentAsync(database: UpdatesDatabase, config: EXUpdatesConfig) {
     database.databaseQueue.async {
       guard let scopeKey = config.scopeKey else {
         NSException(
@@ -70,7 +70,7 @@ internal final class EXUpdatesBuildData {
     ]
   }
 
-  public static func clearAllUpdatesAndSetStaticBuildData(database: EXUpdatesDatabase, config: EXUpdatesConfig, scopeKey: String) {
+  public static func clearAllUpdatesAndSetStaticBuildData(database: UpdatesDatabase, config: EXUpdatesConfig, scopeKey: String) {
     let allUpdates: [EXUpdatesUpdate]
     do {
       allUpdates = try database.allUpdates(withConfig: config)

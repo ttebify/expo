@@ -6,18 +6,18 @@ import ExpoModulesTestCore
 
 import EXManifests
 
-class EXUpdatesReaperSelectionPolicyDevelopmentClientSpec : ExpoSpec {
+class UpdatesReaperSelectionPolicyDevelopmentClientSpec : ExpoSpec {
   override func spec() {
     var update1: EXUpdatesUpdate!
     var update2: EXUpdatesUpdate!
     var update3: EXUpdatesUpdate!
     var update4: EXUpdatesUpdate!
     var update5: EXUpdatesUpdate!
-    var selectionPolicy: EXUpdatesReaperSelectionPolicy!
+    var selectionPolicy: UpdatesReaperSelectionPolicy!
     
     beforeEach {
       let runtimeVersion = "1.0"
-      let database = EXUpdatesDatabase()
+      let database = UpdatesDatabase()
       
       // test updates with different scopes to ensure this policy ignores scopes
       update1 = EXUpdatesUpdate(
@@ -98,7 +98,7 @@ class EXUpdatesReaperSelectionPolicyDevelopmentClientSpec : ExpoSpec {
       
       // for readability/writability, test with a policy that keeps only 3 updates;
       // the actual functionality is independent of the number
-      selectionPolicy = EXUpdatesReaperSelectionPolicyDevelopmentClient.init(maxUpdatesToKeep: 3)
+      selectionPolicy = UpdatesReaperSelectionPolicyDevelopmentClient.init(maxUpdatesToKeep: 3)
     }
     
     describe("updates to delete") {

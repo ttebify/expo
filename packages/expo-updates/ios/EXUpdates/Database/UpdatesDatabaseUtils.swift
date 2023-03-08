@@ -10,13 +10,13 @@
 import Foundation
 import SQLite3
 
-internal struct EXUpdatesDatabaseUtilsErrorInfo {
+internal struct UpdatesDatabaseUtilsErrorInfo {
   let code: Int
   let extendedCode: Int
   let message: String
 }
 
-internal struct EXUpdatesDatabaseUtilsError: Error {
+internal struct UpdatesDatabaseUtilsError: Error {
   enum ErrorKind {
     case SQLitePrepareError
     case SQLiteArgsBindError
@@ -25,7 +25,7 @@ internal struct EXUpdatesDatabaseUtilsError: Error {
   }
 
   let kind: ErrorKind
-  let info: EXUpdatesDatabaseUtilsErrorInfo?
+  let info: UpdatesDatabaseUtilsErrorInfo?
 }
 
 // these are not exported in the swift headers
@@ -41,17 +41,17 @@ private extension UUID {
 /**
  * Utility class with methods for common database functions used across multiple classes.
  */
-internal final class EXUpdatesDatabaseUtils {
+internal final class UpdatesDatabaseUtils {
   public static func execute(sql: String, withArgs args: [Any?]?, onDatabase db: OpaquePointer) throws -> [[String: Any?]] {
     var stmt: OpaquePointer?
     guard sqlite3_prepare_v2(db, String(sql.utf8), -1, &stmt, nil) == SQLITE_OK,
       let stmt = stmt else {
-      throw EXUpdatesDatabaseUtilsError(kind: .SQLitePrepareError, info: errorCodesAndMessage(fromSqlite: db))
+      throw UpdatesDatabaseUtilsError(kind: .SQLitePrepareError, info: errorCodesAndMessage(fromSqlite: db))
     }
 
     if let args = args {
       guard bind(statement: stmt, withArgs: args) else {
-        throw EXUpdatesDatabaseUtilsError(kind: .SQLiteArgsBindError, info: errorCodesAndMessage(fromSqlite: db))
+        throw UpdatesDatabaseUtilsError(kind: .SQLiteArgsBindError, info: errorCodesAndMessage(fromSqlite: db))
       }
     }
 
@@ -96,7 +96,7 @@ internal final class EXUpdatesDatabaseUtils {
     sqlite3_finalize(stmt)
 
     if didError {
-      throw EXUpdatesDatabaseUtilsError(kind: .SQLiteGetResultsError, info: errorCodesAndMessage(fromSqlite: db))
+      throw UpdatesDatabaseUtilsError(kind: .SQLiteGetResultsError, info: errorCodesAndMessage(fromSqlite: db))
     }
 
     return rows
@@ -158,7 +158,7 @@ internal final class EXUpdatesDatabaseUtils {
       return sqlite3_column_double(stmt, column)
     case SQLITE_BLOB:
       guard sqlite3_column_bytes(stmt, column) == 16 else {
-        throw EXUpdatesDatabaseUtilsError(kind: .SQLiteBlobNotUUID, info: nil)
+        throw UpdatesDatabaseUtilsError(kind: .SQLiteBlobNotUUID, info: nil)
       }
       let blob = Data(bytes: sqlite3_column_blob(stmt, column), count: 16)
       return blob.withUnsafeBytes { rawBytes -> UUID in
@@ -175,11 +175,11 @@ internal final class EXUpdatesDatabaseUtils {
     }
   }
 
-  public static func errorCodesAndMessage(fromSqlite db: OpaquePointer) -> EXUpdatesDatabaseUtilsErrorInfo {
+  public static func errorCodesAndMessage(fromSqlite db: OpaquePointer) -> UpdatesDatabaseUtilsErrorInfo {
     let code = sqlite3_errcode(db)
     let extendedCode = sqlite3_extended_errcode(db)
     let message = String(cString: sqlite3_errmsg(db))
-    return EXUpdatesDatabaseUtilsErrorInfo(code: Int(code), extendedCode: Int(extendedCode), message: message)
+    return UpdatesDatabaseUtilsErrorInfo(code: Int(code), extendedCode: Int(extendedCode), message: message)
   }
 
   public static func date(fromUnixTimeMilliseconds number: NSNumber) -> Date {

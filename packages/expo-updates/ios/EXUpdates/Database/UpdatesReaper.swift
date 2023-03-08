@@ -4,8 +4,9 @@
 
 import Foundation
 
+@objc(EXUpdatesReaper)
 @objcMembers
-public final class EXUpdatesReaper: NSObject {
+public final class UpdatesReaper: NSObject {
   /**
    * Safely clears old, unused assets and updates from the filesystem and database.
    *
@@ -13,7 +14,7 @@ public final class EXUpdatesReaper: NSObject {
    */
   public static func reapUnusedUpdates(
     withConfig config: EXUpdatesConfig,
-    database: EXUpdatesDatabase,
+    database: UpdatesDatabase,
     directory: URL,
     selectionPolicy: EXUpdatesSelectionPolicy,
     launchedUpdate: EXUpdatesUpdate
