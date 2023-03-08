@@ -1,0 +1,27 @@
+---
+title: Development Builds Installation
+sidebar_title: Installation
+description: Learn what are the prerequisites and installation steps to create a development build.
+---
+
+import { Terminal } from '~/ui/components/Snippet';
+
+In this guide, you'll learn what you need to install in your project to create a development build.
+
+## Prerequisites
+
+You need to initialize your project with Expo. If you still need to do so, see the [initializing steps](/get-started/create-a-new-app/#initializing-the-project) if you are starting a new project.
+
+We also recommend installing EAS CLI as a global npm dependency by running the following command:
+
+<Terminal cmd={['$ npm install -g eas-cli']} />
+
+## Install expo-dev-client
+
+To initialize a development build, you need to install the `expo-dev-client` library in your project:
+
+<Terminal cmd={['$ npx expo install expo-dev-client']} />
+
+## Next steps
+
+That's it! You're ready to create a development build. For more information, see the [Create a build](/home/develop/development-builds/create-a-build) guide.

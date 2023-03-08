@@ -1,27 +1,18 @@
 ---
-title: Create development builds
+title: Create a build
 description: Learn how to create development builds for a project.
 ---
 
 import { Terminal } from '~/ui/components/Snippet';
 import { Tab, Tabs } from '~/ui/components/Tabs';
 import { BoxLink } from '~/ui/components/BoxLink';
+import { Step } from '~/ui/components/Step';
 
-Development builds can be created with [EAS Build](/build/introduction/) or locally on your computer, if you have Xcode and Android Studio. In this guide, you'll find information on how to create a development build and then install them on an emulator/simulator or a physical device to continue developing your app.
+Development builds can be created with [EAS Build](/build/introduction/) or locally on your computer, if you have Xcode and Android Studio.
 
-## Prerequisites
+In this guide, you'll find information on how to create a development build and then install them on an emulator/simulator or a physical device to continue developing your app.
 
-You need to initialize your project with Expo. If you still need to do so, see the [initializing steps](/get-started/create-a-new-app/#initializing-the-project) if you are starting a new project.
-
-We also recommend installing EAS CLI as a global npm dependency by running the following command:
-
-<Terminal cmd={['$ npm install -g eas-cli']} />
-
-## Install expo-dev-client
-
-To initialize a development build, you need to install the `expo-dev-client` library in your project:
-
-<Terminal cmd={['$ npx expo install expo-dev-client']} />
+<Step label="1">
 
 ## Create and install EAS Build
 
@@ -51,7 +42,11 @@ The `development` profile sets the following options:
 
 > iOS builds where `developmentClient` is set to `true` on the build profile should always be distributed as `internal`. If you are distributing for TestFlight, you have to set the distribution to `store`.
 
-### On emulator/simulator
+</Step>
+
+<Step label="2">
+
+## Run a development build on emulator/simulator
 
 Follow the steps below to create and install the development build on an Android Emulator or an iOS Simulator.
 
@@ -105,7 +100,11 @@ See [Installing build on the simulator](/build-reference/simulators/#installing-
 
 </Tabs>
 
-### On a device
+</Step>
+
+<Step label="3">
+
+## Run a development build on the device
 
 Follow the steps below to create and install the development build on an Android or an iOS device. Each platform has specific instructions you'll have to follow:
 
@@ -148,6 +147,8 @@ To share the build with your team, direct them to the build page in the Expo das
 </Tab>
 
 </Tabs>
+
+</Step>
 
 ## Next steps
 

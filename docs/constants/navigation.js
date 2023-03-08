@@ -60,6 +60,15 @@ const general = [
         { expanded: true }
       ),
       makeGroup(
+        'Development builds',
+        [
+          makePage('home/develop/development-builds/overview.mdx'),
+          makePage('home/develop/development-builds/installation.mdx'),
+          makePage('home/develop/development-builds/create-a-build.mdx'),
+        ],
+        { expanded: true }
+      ),
+      makeGroup(
         'Tutorial',
         [
           makePage('tutorial/create-your-first-app.mdx'),
